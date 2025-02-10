@@ -1,7 +1,5 @@
 # Apisix Dashboard Unofficial
 
-**English version: 
-
 **项目状态：** 当前项目仍在开发中，目标是发布第一个可用版本。
 
 ## 项目简介

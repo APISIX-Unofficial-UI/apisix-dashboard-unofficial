@@ -26,7 +26,7 @@ yarn run dev
 
 ## 项目路线图
 
-详见：[Roadmap](https://github.com/APISIX-Unofficial-UI/apisix-dashboard-unofficial/tree/main/docs/roadmap_2025_zh.md)
+详见：[Roadmap](https://github.com/APISIX-Unofficial-UI/apisix-dashboard-unofficial/tree/main/docs/roadmap_2025.md)
 
 ## FAQ
 

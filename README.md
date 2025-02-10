@@ -8,7 +8,7 @@
 
 ## 快速开始
 
-你可以直接使用 [预览地址](https://apisix-dashboard.lensual.space/) 体验。推荐使用 yarn 或 pnpm 进行依赖管理。
+你可以直接使用 [预览地址](https://apisix-dashboard.lensual.space/) 体验。请使用 yarn 进行依赖管理。
 
 ### 安装依赖
 

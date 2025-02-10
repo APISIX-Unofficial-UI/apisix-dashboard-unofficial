@@ -2,13 +2,22 @@
 
 [Preview](https://apisix-dashboard.lensual.space/)
 
-纯前端应用 无后端
+项目目前未完成，当前目标：完成系统设计和RoadMap，并发布第一个可用版本。
 
 ## Quick Start
 
-TODO
+可直接用 [Preview](https://apisix-dashboard.lensual.space/) 吧
 
-先直接用 [Preview](https://apisix-dashboard.lensual.space/) 吧
+推荐使用yarn或pnpm进行操作。
+
+### 安装依赖
+在项目根目录下执行:
+```yarn```
+
+### 启动测试环境
+```yarn run dev```
+
+
 
 ## FAQ
 

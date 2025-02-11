@@ -5,6 +5,8 @@ export default {
   submitError: '提交失败：{message}',
   step1: {
     title: '设置路由信息',
+    id: '路由id',
+    idPlaceholder: '可选的路由ID，如果不输入，将自动生成',
     subtitle: '设置路由信息',
     basic: '基本信息',
     name: '名称',

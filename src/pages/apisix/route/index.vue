@@ -20,7 +20,7 @@
         </div>
       </t-row>
       <t-table
-        v-model:displayColumns="displayColumns"
+        v-model:display-columns="displayColumns"
         :data="data"
         :columns="COLUMNS"
         :column-controller="columnControllerConfig"
@@ -227,6 +227,7 @@ const staticColumn: string[] = ['row-select', 'op'];
 const displayColumns = ref<TableProps['displayColumns']>(
   staticColumn.concat([
     'value.name',
+    'value.id',
     'value.host',
     'value.uri',
     'value.desc',

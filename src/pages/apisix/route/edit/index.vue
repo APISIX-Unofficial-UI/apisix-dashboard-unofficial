@@ -35,6 +35,14 @@
               :placeholder="t('pages.apisixRouteEdit.step1.namePlaceholder')"
             />
           </t-form-item>
+          <t-form-item :label="t('pages.apisixRouteEdit.step1.id')" name="id">
+            <t-input
+              v-model="routeId"
+              :style="{ width: '480px' }"
+              :placeholder="t('pages.apisixRouteEdit.step1.idPlaceholder')"
+              :disabled="isUpdateMode"
+            />
+          </t-form-item>
           <t-form-item :label="t('pages.apisixRouteEdit.step1.desc')" name="desc">
             <t-input
               v-model="formData.desc"
@@ -181,6 +189,8 @@ import { FORM_RULES_1, FORM_RULES_2, FORM_RULES_3, METHOD_OPTIONS } from './cons
 let INITIAL_DATA: ApisixAdminRoutesPostRequest = {};
 
 const formData = ref<ApisixAdminRoutesPostRequest>(INITIAL_DATA);
+const routeId = ref<string>('');
+const isUpdateMode = ref(false);
 const activeStep = ref(1);
 
 const router = useRouter();
@@ -188,11 +198,14 @@ const router = useRouter();
 onActivated(async () => {
   onReset();
 
-  if (!router.currentRoute.value.query.id) {
-    return;
+  const queryId = router.currentRoute.value.query.id;
+  if (queryId) {
+    isUpdateMode.value = true;
+    routeId.value = queryId.toString();
+    fetchData(routeId.value);
+  } else {
+    isUpdateMode.value = false;
   }
-  const id = router.currentRoute.value.query.id.toString();
-  fetchData(id);
 });
 
 const dataLoading = ref(false);
@@ -223,6 +236,7 @@ const onReset = () => {
   activeStep.value = 1;
   INITIAL_DATA = {};
   formData.value = cloneDeep(INITIAL_DATA);
+  routeId.value = '';
 };
 const onReapply = () => {
   onReset();
@@ -240,7 +254,7 @@ const onSubmit = async (result: SubmitContext) => {
   dataLoading.value = true;
   let res: AxiosResponse<ApisixAdminRoutesPost201Response>;
   try {
-    if (formData.value.id) {
+    if (isUpdateMode.value) {
       res = await update();
     } else {
       res = await create();
@@ -264,7 +278,7 @@ const create = () => {
 };
 const update = () => {
   const req: RouteApiApisixAdminRoutesIdPutRequest = {
-    id: formData.value.id as string,
+    id: routeId.value as string,
     apisixAdminRoutesPostRequest: formData.value,
   };
   return RouteApi.apisixAdminRoutesIdPut(req);

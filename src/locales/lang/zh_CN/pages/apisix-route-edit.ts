@@ -3,6 +3,8 @@ export default {
   nextStep: '下一步',
   submit: '提交',
   submitError: '提交失败：{message}',
+  routeExistsError: '路由ID已存在, 请勿重复提交',
+  unknownError: '未知原因提交失败: {message}',
   step1: {
     title: '设置路由信息',
     id: '路由id',

@@ -177,6 +177,7 @@ import { RouteApi } from '@/api/apisix/admin';
 import {
   ApisixAdminRoutesPost201Response,
   ApisixAdminRoutesPostRequest,
+  RouteApiApisixAdminRoutesIdGetRequest,
   RouteApiApisixAdminRoutesIdPutRequest,
   RouteApiApisixAdminRoutesPostRequest,
 } from '@/api/apisix/admin/typescript-axios';
@@ -265,12 +266,42 @@ const onSubmit = async (result: SubmitContext) => {
       if (e.response.data.error_msg) {
         MessagePlugin.error(t('pages.apisixRouteEdit.submitError', { message: e.response.data.error_msg }));
       }
+    } else if (e instanceof Error && e.message === t('pages.apisixRouteEdit.routeExistsError')) {
+      MessagePlugin.error(e.message);
+    } else {
+      MessagePlugin.error(t('pages.apisixRouteEdit.unknownError', { message: String(e) }));
     }
     console.error(e);
   }
+  console.error(res);
   dataLoading.value = false;
 };
-const create = () => {
+const create = async () => {
+  // Custom id.
+  if (routeId.value !== '') {
+    try {
+      // Check if route exists.
+      const checkReq: RouteApiApisixAdminRoutesIdGetRequest = {
+        id: routeId.value,
+      };
+      await RouteApi.apisixAdminRoutesIdGet(checkReq);
+
+      // route exists, throw.
+      throw new Error(t('pages.apisixRouteEdit.routeExistsError'));
+    } catch (error) {
+      // route does not exist.
+      if (error.response?.status === 404) {
+        const req: RouteApiApisixAdminRoutesIdPutRequest = {
+          id: routeId.value,
+          apisixAdminRoutesPostRequest: formData.value,
+        };
+        return RouteApi.apisixAdminRoutesIdPut(req);
+      }
+
+      throw error;
+    }
+  }
+
   const req: RouteApiApisixAdminRoutesPostRequest = {
     apisixAdminRoutesPostRequest: formData.value,
   };

@@ -5,6 +5,15 @@ export default {
   submitError: '提交失败：{message}',
   routeExistsError: '路由ID已存在, 请勿重复提交',
   unknownError: '未知原因提交失败: {message}',
+  validation: {
+    uriRequired: '请输入 URI',
+    proxyRewrite: {
+      staticUriRequired: '请输入新路径',
+      regexMatchRequired: '请输入正则匹配表达式',
+      regexTemplateRequired: '请输入正则替换模板',
+      hostRequired: '请输入新域名',
+    },
+  },
   step1: {
     title: '设置路由信息',
     id: '路由id',
@@ -22,6 +31,37 @@ export default {
     uri: '路径',
     uriPlaceholder: '请输入 HTTP 请求路径',
     upstream: '上游',
+    proxyRewriteTitle: '请求改写',
+    proxyRewrite: {
+      uri: {
+        label: '路径改写',
+        keep: '保持原样',
+        static: '静态改写',
+        regex: '正则改写',
+        newPath: '新路径',
+        newPathPlaceholder: '请输入新路径',
+        regexMatch: '匹配正则表达式',
+        regexMatchPlaceholder: '请输入匹配正则表达式',
+        regexTemplate: '转发路径模板',
+        regexTemplatePlaceholder: '请输入转发路径模板',
+      },
+      host: {
+        label: '域名改写',
+        keep: '保持原样',
+        static: '静态改写',
+        newHost: '新域名',
+        newHostPlaceholder: '请输入新域名',
+      },
+      methodRewrite: {
+        label: 'HTTP方法改写',
+        keep: '保持原样',
+      },
+      headers: {
+        label: '请求头改写',
+        namePlaceholder: '请输入 参数名称',
+        valuePlaceholder: '请输入 参数值',
+      },
+    },
   },
   step2: {
     title: '插件配置',

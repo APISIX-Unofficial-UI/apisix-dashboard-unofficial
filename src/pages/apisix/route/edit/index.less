@@ -12,7 +12,62 @@
 
 .step-form {
   margin-top: var(--td-comp-margin-xxxl);
+
+  .rewrite-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .radio-group {
+      margin-bottom: 8px;
+      
+      .radio-options {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+      }
+    }
+
+    .input-field {
+      width: 480px;
+    }
+
+    .form-item-spacing {
+      margin-top: 8px;
+      
+      :deep(.t-form__label) {
+        margin-right: 16px;
+      }
+    }
+  }
+
+  .headers-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .header-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+
+      .header-input {
+        width: 230px;
+      }
+
+      .remove-button {
+        margin-left: 8px;
+      }
+    }
+
+    .add-header-button {
+      margin-top: 8px;
+      align-self: flex-start;
+    }
+  }
 }
+
 
 .result-success {
   display: flex;

@@ -78,6 +78,129 @@
             />
           </t-form-item>
 
+          <t-divider align="left">{{ t('pages.apisixRouteEdit.step1.proxyRewriteTitle') }}</t-divider>
+
+          <!-- 路径改写 -->
+          <t-form-item :label="t('pages.apisixRouteEdit.step1.proxyRewrite.uri.label')">
+            <div class="rewrite-container">
+              <t-radio-group v-model="proxyRewrite.uriType" class="radio-group">
+                <div class="radio-options">
+                  <t-radio value="keep">{{ t('pages.apisixRouteEdit.step1.proxyRewrite.uri.keep') }}</t-radio>
+                  <t-radio value="static">{{ t('pages.apisixRouteEdit.step1.proxyRewrite.uri.static') }}</t-radio>
+                  <t-radio value="regex">{{ t('pages.apisixRouteEdit.step1.proxyRewrite.uri.regex') }}</t-radio>
+                </div>
+              </t-radio-group>
+
+              <template v-if="proxyRewrite.uriType === 'static'">
+                <t-form-item
+                  v-if="proxyRewrite.uriType === 'static'"
+                  :label="t('pages.apisixRouteEdit.step1.proxyRewrite.uri.newPath')"
+                  name="proxy-rewrite-static-uri"
+                >
+                  <t-input
+                    v-model="proxyRewrite.uri"
+                    class="input-field"
+                    :placeholder="t('pages.apisixRouteEdit.step1.proxyRewrite.uri.newPathPlaceholder')"
+                  />
+                </t-form-item>
+              </template>
+
+              <template v-if="proxyRewrite.uriType === 'regex'">
+                <t-form-item
+                  v-if="proxyRewrite.uriType === 'regex'"
+                  :label="t('pages.apisixRouteEdit.step1.proxyRewrite.uri.regexMatch')"
+                  name="proxy-rewrite-regex-match"
+                  class="form-item-spacing"
+                >
+                  <t-input
+                    v-model="proxyRewrite.regexMatch"
+                    class="input-field"
+                    :placeholder="t('pages.apisixRouteEdit.step1.proxyRewrite.uri.regexMatchPlaceholder')"
+                  />
+                </t-form-item>
+                <t-form-item
+                  v-if="proxyRewrite.uriType === 'regex'"
+                  :label="t('pages.apisixRouteEdit.step1.proxyRewrite.uri.regexTemplate')"
+                  name="proxy-rewrite-regex-template"
+                  class="form-item-spacing"
+                >
+                  <t-input
+                    v-model="proxyRewrite.regexTemplate"
+                    class="input-field"
+                    :placeholder="t('pages.apisixRouteEdit.step1.proxyRewrite.uri.regexTemplatePlaceholder')"
+                  />
+                </t-form-item>
+              </template>
+            </div>
+          </t-form-item>
+
+          <!-- 域名改写 -->
+          <t-form-item :label="t('pages.apisixRouteEdit.step1.proxyRewrite.host.label')">
+            <div class="rewrite-container">
+              <t-radio-group v-model="proxyRewrite.hostType" class="radio-group">
+                <div class="radio-options">
+                  <t-radio value="keep">{{ t('pages.apisixRouteEdit.step1.proxyRewrite.host.keep') }}</t-radio>
+                  <t-radio value="static">{{ t('pages.apisixRouteEdit.step1.proxyRewrite.host.static') }}</t-radio>
+                </div>
+              </t-radio-group>
+
+              <template v-if="proxyRewrite.hostType === 'static'">
+                <t-form-item
+                  v-if="proxyRewrite.hostType === 'static'"
+                  :label="t('pages.apisixRouteEdit.step1.proxyRewrite.host.newHost')"
+                  name="proxy-rewrite-host"
+                  class="form-item-spacing"
+                >
+                  <t-input
+                    v-model="proxyRewrite.host"
+                    class="input-field"
+                    :placeholder="t('pages.apisixRouteEdit.step1.proxyRewrite.host.newHostPlaceholder')"
+                  />
+                </t-form-item>
+              </template>
+            </div>
+          </t-form-item>
+
+          <!-- HTTP方法改写 -->
+          <t-form-item :label="t('pages.apisixRouteEdit.step1.proxyRewrite.methodRewrite.label')">
+            <t-select v-model="proxyRewrite.method" class="method-rewrite-select">
+              <t-option value="">{{ t('pages.apisixRouteEdit.step1.proxyRewrite.methodRewrite.keep') }}</t-option>
+              <t-option v-for="(item, index) in METHOD_OPTIONS" :key="index" :value="item.value" :label="item.label">
+                {{ item.label }}
+              </t-option>
+            </t-select>
+          </t-form-item>
+
+          <!-- 请求头改写 -->
+          <t-form-item :label="t('pages.apisixRouteEdit.step1.proxyRewrite.headers.label')">
+            <div class="headers-container">
+              <div v-for="(header, index) in proxyRewrite.headers" :key="index" class="header-row">
+                <t-input
+                  v-model="header.name"
+                  class="header-input"
+                  :placeholder="t('pages.apisixRouteEdit.step1.proxyRewrite.headers.namePlaceholder')"
+                />
+                <t-input
+                  v-model="header.value"
+                  class="header-input"
+                  :placeholder="t('pages.apisixRouteEdit.step1.proxyRewrite.headers.valuePlaceholder')"
+                />
+                <t-button
+                  v-if="proxyRewrite.headers.length > 1"
+                  variant="text"
+                  theme="danger"
+                  class="remove-button"
+                  @click="removeHeader(index)"
+                >
+                  <t-icon name="remove" />
+                </t-button>
+              </div>
+              <t-button variant="text" class="add-header-button" @click="addHeader">
+                <t-icon name="add" />
+              </t-button>
+            </div>
+          </t-form-item>
+
           <t-divider align="left">{{ t('pages.apisixRouteEdit.step1.upstream') }}</t-divider>
 
           <upstream-form
@@ -193,6 +316,70 @@ const formData = ref<ApisixAdminRoutesPostRequest>(INITIAL_DATA);
 const routeId = ref<string>('');
 const isUpdateMode = ref(false);
 const activeStep = ref(1);
+
+// Proxy rewrite logic.
+const proxyRewrite = ref({
+  scheme: '',
+  uriType: 'keep',
+  uri: '',
+  regexMatch: '',
+  regexTemplate: '',
+  hostType: 'keep',
+  host: '',
+  method: '',
+  headers: [{ name: '', value: '' }],
+});
+
+const addHeader = () => {
+  proxyRewrite.value.headers.push({ name: '', value: '' });
+};
+
+const removeHeader = (index: number) => {
+  proxyRewrite.value.headers.splice(index, 1);
+};
+
+watch(
+  proxyRewrite,
+  (newValue) => {
+    if (!formData.value.plugins) {
+      formData.value.plugins = {};
+    }
+
+    const proxyRewriteConfig: any = {};
+
+    if (newValue.scheme) {
+      proxyRewriteConfig.scheme = newValue.scheme;
+    }
+
+    if (newValue.uriType === 'static' && newValue.uri) {
+      proxyRewriteConfig.uri = newValue.uri;
+    } else if (newValue.uriType === 'regex' && newValue.regexMatch && newValue.regexTemplate) {
+      proxyRewriteConfig.regex_uri = [newValue.regexMatch, newValue.regexTemplate];
+    }
+
+    if (newValue.hostType === 'static' && newValue.host) {
+      proxyRewriteConfig.host = newValue.host;
+    }
+
+    if (newValue.method) {
+      proxyRewriteConfig.method = newValue.method;
+    }
+
+    const headers = newValue.headers.filter((h) => h.name && h.value);
+    if (headers.length > 0) {
+      proxyRewriteConfig.headers = {
+        set: Object.fromEntries(headers.map((h) => [h.name, h.value])),
+      };
+    }
+
+    if (Object.keys(proxyRewriteConfig).length > 0) {
+      (formData.value.plugins as Record<string, any>)['proxy-rewrite'] = proxyRewriteConfig;
+    } else {
+      delete (formData.value.plugins as Record<string, any>)['proxy-rewrite'];
+    }
+  },
+  { deep: true },
+);
 
 const router = useRouter();
 

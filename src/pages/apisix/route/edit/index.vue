@@ -27,7 +27,13 @@
         <!-- 分步表单1 设置路由信息 -->
         <t-divider align="left">{{ t('pages.apisixRouteEdit.step1.basic') }}</t-divider>
 
-        <t-form v-show="activeStep === 1" class="step-form" :data="formData" :rules="FORM_RULES_1" @submit="onNextStep">
+        <t-form
+          v-show="activeStep === 1"
+          class="step-form"
+          :data="{ ...formData, proxyRewrite }"
+          :rules="FORM_RULES_1"
+          @submit="onNextStep"
+        >
           <t-form-item :label="t('pages.apisixRouteEdit.step1.name')" name="name">
             <t-input
               v-model="formData.name"
@@ -95,7 +101,7 @@
                 <t-form-item
                   v-if="proxyRewrite.uriType === 'static'"
                   :label="t('pages.apisixRouteEdit.step1.proxyRewrite.uri.newPath')"
-                  name="proxy-rewrite-static-uri"
+                  name="proxyRewrite.uri"
                 >
                   <t-input
                     v-model="proxyRewrite.uri"
@@ -109,7 +115,7 @@
                 <t-form-item
                   v-if="proxyRewrite.uriType === 'regex'"
                   :label="t('pages.apisixRouteEdit.step1.proxyRewrite.uri.regexMatch')"
-                  name="proxy-rewrite-regex-match"
+                  name="proxyRewrite.regexMatch"
                   class="form-item-spacing"
                 >
                   <t-input
@@ -121,7 +127,7 @@
                 <t-form-item
                   v-if="proxyRewrite.uriType === 'regex'"
                   :label="t('pages.apisixRouteEdit.step1.proxyRewrite.uri.regexTemplate')"
-                  name="proxy-rewrite-regex-template"
+                  name="proxyRewrite.regexTemplate"
                   class="form-item-spacing"
                 >
                   <t-input
@@ -148,7 +154,7 @@
                 <t-form-item
                   v-if="proxyRewrite.hostType === 'static'"
                   :label="t('pages.apisixRouteEdit.step1.proxyRewrite.host.newHost')"
-                  name="proxy-rewrite-host"
+                  name="proxyRewrite.host"
                   class="form-item-spacing"
                 >
                   <t-input

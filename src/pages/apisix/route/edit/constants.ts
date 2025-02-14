@@ -13,8 +13,7 @@ export const FORM_RULES_1: Record<string, FormRule[]> = {
       type: 'error',
     },
   ],
-  // 路径改写验证规则
-  'proxy-rewrite-static-uri': [
+  'proxyRewrite.uri': [
     {
       required: true,
       message: t('pages.apisixRouteEdit.validation.proxyRewrite.staticUriRequired'),
@@ -22,7 +21,7 @@ export const FORM_RULES_1: Record<string, FormRule[]> = {
       trigger: 'blur',
     },
   ],
-  'proxy-rewrite-regex-match': [
+  'proxyRewrite.regexMatch': [
     {
       required: true,
       message: t('pages.apisixRouteEdit.validation.proxyRewrite.regexMatchRequired'),
@@ -30,7 +29,7 @@ export const FORM_RULES_1: Record<string, FormRule[]> = {
       trigger: 'blur',
     },
   ],
-  'proxy-rewrite-regex-template': [
+  'proxyRewrite.regexTemplate': [
     {
       required: true,
       message: t('pages.apisixRouteEdit.validation.proxyRewrite.regexTemplateRequired'),
@@ -38,7 +37,7 @@ export const FORM_RULES_1: Record<string, FormRule[]> = {
       trigger: 'blur',
     },
   ],
-  'proxy-rewrite-host': [
+  'proxyRewrite.host': [
     {
       required: true,
       message: t('pages.apisixRouteEdit.validation.proxyRewrite.hostRequired'),

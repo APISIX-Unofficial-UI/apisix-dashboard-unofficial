@@ -325,7 +325,6 @@ const activeStep = ref(1);
 
 // Proxy rewrite logic.
 const proxyRewrite = ref({
-  scheme: '',
   uriType: 'keep',
   uri: '',
   regexMatch: '',
@@ -344,6 +343,42 @@ const removeHeader = (index: number) => {
   proxyRewrite.value.headers.splice(index, 1);
 };
 
+function parseProxyRewritePlugin() {
+  const config = formData.value.plugins?.['proxy-rewrite'];
+  if (config) {
+    if (config.regex_uri) {
+      proxyRewrite.value.uriType = 'regex';
+      proxyRewrite.value.regexMatch = config.regex_uri[0] || '';
+      proxyRewrite.value.regexTemplate = config.regex_uri[1] || '';
+      proxyRewrite.value.uri = '';
+    } else if (config.uri) {
+      proxyRewrite.value.uriType = 'static';
+      proxyRewrite.value.uri = config.uri;
+      proxyRewrite.value.regexMatch = '';
+      proxyRewrite.value.regexTemplate = '';
+    } else {
+      proxyRewrite.value.uriType = 'keep';
+      proxyRewrite.value.uri = '';
+      proxyRewrite.value.regexMatch = '';
+      proxyRewrite.value.regexTemplate = '';
+    }
+
+    if (config.host) {
+      proxyRewrite.value.hostType = 'static';
+      proxyRewrite.value.host = config.host;
+    } else {
+      proxyRewrite.value.hostType = 'keep';
+      proxyRewrite.value.host = '';
+    }
+
+    proxyRewrite.value.method = config.method ?? '';
+
+    const setObj = config.headers?.set ?? {};
+    const headersArray = Object.entries(setObj).map(([k, v]) => ({ name: k, value: v }));
+    proxyRewrite.value.headers = headersArray.length ? headersArray : [{ name: '', value: '' }];
+  }
+}
+
 watch(
   proxyRewrite,
   (newValue) => {
@@ -352,10 +387,6 @@ watch(
     }
 
     const proxyRewriteConfig: any = {};
-
-    if (newValue.scheme) {
-      proxyRewriteConfig.scheme = newValue.scheme;
-    }
 
     if (newValue.uriType === 'static' && newValue.uri) {
       proxyRewriteConfig.uri = newValue.uri;
@@ -409,6 +440,7 @@ const fetchData = async (id: string) => {
     const res = await RouteApi.apisixAdminRoutesIdGet({ id });
     INITIAL_DATA = res.data.value;
     formData.value = cloneDeep(INITIAL_DATA);
+    parseProxyRewritePlugin();
   } catch (e) {
     console.error(e); // TODO Message
   }
@@ -431,6 +463,17 @@ const onReset = () => {
   INITIAL_DATA = {};
   formData.value = cloneDeep(INITIAL_DATA);
   routeId.value = '';
+  isUpdateMode.value = false;
+  proxyRewrite.value = {
+    uriType: 'keep',
+    uri: '',
+    regexMatch: '',
+    regexTemplate: '',
+    hostType: 'keep',
+    host: '',
+    method: '',
+    headers: [{ name: '', value: '' }],
+  };
 };
 const onReapply = () => {
   onReset();

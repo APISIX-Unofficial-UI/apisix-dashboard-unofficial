@@ -13,6 +13,14 @@
 .step-form {
   margin-top: var(--td-comp-margin-xxxl);
 
+  :deep(.t-form__label) {
+    width: 160px;
+    white-space: nowrap;
+    text-align: right;
+    margin-right: 24px;
+    box-sizing: border-box;
+  }
+
   .rewrite-container {
     display: flex;
     flex-direction: column;
@@ -20,7 +28,6 @@
 
     .radio-group {
       margin-bottom: 8px;
-      
       .radio-options {
         display: flex;
         align-items: center;
@@ -34,10 +41,6 @@
 
     .form-item-spacing {
       margin-top: 8px;
-      
-      :deep(.t-form__label) {
-        margin-right: 16px;
-      }
     }
   }
 
@@ -53,7 +56,7 @@
       width: 100%;
 
       .header-input {
-        width: 230px;
+        width: 210px;
       }
 
       .remove-button {
@@ -67,7 +70,6 @@
     }
   }
 }
-
 
 .result-success {
   display: flex;

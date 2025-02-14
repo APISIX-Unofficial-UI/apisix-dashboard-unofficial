@@ -87,89 +87,77 @@
           <t-divider align="left">{{ t('pages.apisixRouteEdit.step1.proxyRewriteTitle') }}</t-divider>
 
           <!-- 路径改写 -->
+          <!-- 路径改写 -->
+          <!-- 1) 在一个 <t-form-item> 中放单选组，实现“保持原样/静态改写/正则改写”互斥选择 -->
           <t-form-item :label="t('pages.apisixRouteEdit.step1.proxyRewrite.uri.label')">
-            <div class="rewrite-container">
-              <t-radio-group v-model="proxyRewrite.uriType" class="radio-group">
-                <div class="radio-options">
-                  <t-radio value="keep">{{ t('pages.apisixRouteEdit.step1.proxyRewrite.uri.keep') }}</t-radio>
-                  <t-radio value="static">{{ t('pages.apisixRouteEdit.step1.proxyRewrite.uri.static') }}</t-radio>
-                  <t-radio value="regex">{{ t('pages.apisixRouteEdit.step1.proxyRewrite.uri.regex') }}</t-radio>
-                </div>
-              </t-radio-group>
+            <t-radio-group v-model="proxyRewrite.uriType">
+              <t-radio value="keep">{{ t('pages.apisixRouteEdit.step1.proxyRewrite.uri.keep') }}</t-radio>
+              <t-radio value="static">{{ t('pages.apisixRouteEdit.step1.proxyRewrite.uri.static') }}</t-radio>
+              <t-radio value="regex">{{ t('pages.apisixRouteEdit.step1.proxyRewrite.uri.regex') }}</t-radio>
+            </t-radio-group>
+          </t-form-item>
 
-              <template v-if="proxyRewrite.uriType === 'static'">
-                <t-form-item
-                  v-if="proxyRewrite.uriType === 'static'"
-                  :label="t('pages.apisixRouteEdit.step1.proxyRewrite.uri.newPath')"
-                  name="proxyRewrite.uri"
-                >
-                  <t-input
-                    v-model="proxyRewrite.uri"
-                    class="input-field"
-                    :placeholder="t('pages.apisixRouteEdit.step1.proxyRewrite.uri.newPathPlaceholder')"
-                  />
-                </t-form-item>
-              </template>
+          <!-- 2) 如果选中“静态改写”，则显示“新路径”输入框 -->
+          <t-form-item
+            v-if="proxyRewrite.uriType === 'static'"
+            :label="t('pages.apisixRouteEdit.step1.proxyRewrite.uri.newPath')"
+            name="proxyRewrite.uri"
+          >
+            <t-input
+              v-model="proxyRewrite.uri"
+              style="width: 480px"
+              :placeholder="t('pages.apisixRouteEdit.step1.proxyRewrite.uri.newPathPlaceholder')"
+            />
+          </t-form-item>
 
-              <template v-if="proxyRewrite.uriType === 'regex'">
-                <t-form-item
-                  v-if="proxyRewrite.uriType === 'regex'"
-                  :label="t('pages.apisixRouteEdit.step1.proxyRewrite.uri.regexMatch')"
-                  name="proxyRewrite.regexMatch"
-                  class="form-item-spacing"
-                >
-                  <t-input
-                    v-model="proxyRewrite.regexMatch"
-                    class="input-field"
-                    :placeholder="t('pages.apisixRouteEdit.step1.proxyRewrite.uri.regexMatchPlaceholder')"
-                  />
-                </t-form-item>
-                <t-form-item
-                  v-if="proxyRewrite.uriType === 'regex'"
-                  :label="t('pages.apisixRouteEdit.step1.proxyRewrite.uri.regexTemplate')"
-                  name="proxyRewrite.regexTemplate"
-                  class="form-item-spacing"
-                >
-                  <t-input
-                    v-model="proxyRewrite.regexTemplate"
-                    class="input-field"
-                    :placeholder="t('pages.apisixRouteEdit.step1.proxyRewrite.uri.regexTemplatePlaceholder')"
-                  />
-                </t-form-item>
-              </template>
-            </div>
+          <!-- 3) 如果选中“正则改写”，则分别显示“匹配正则”和“替换模板”两个输入框 -->
+          <t-form-item
+            v-if="proxyRewrite.uriType === 'regex'"
+            :label="t('pages.apisixRouteEdit.step1.proxyRewrite.uri.regexMatch')"
+            name="proxyRewrite.regexMatch"
+          >
+            <t-input
+              v-model="proxyRewrite.regexMatch"
+              style="width: 480px"
+              :placeholder="t('pages.apisixRouteEdit.step1.proxyRewrite.uri.regexMatchPlaceholder')"
+            />
+          </t-form-item>
+
+          <t-form-item
+            v-if="proxyRewrite.uriType === 'regex'"
+            :label="t('pages.apisixRouteEdit.step1.proxyRewrite.uri.regexTemplate')"
+            name="proxyRewrite.regexTemplate"
+          >
+            <t-input
+              v-model="proxyRewrite.regexTemplate"
+              style="width: 480px"
+              :placeholder="t('pages.apisixRouteEdit.step1.proxyRewrite.uri.regexTemplatePlaceholder')"
+            />
           </t-form-item>
 
           <!-- 域名改写 -->
           <t-form-item :label="t('pages.apisixRouteEdit.step1.proxyRewrite.host.label')">
-            <div class="rewrite-container">
-              <t-radio-group v-model="proxyRewrite.hostType" class="radio-group">
-                <div class="radio-options">
-                  <t-radio value="keep">{{ t('pages.apisixRouteEdit.step1.proxyRewrite.host.keep') }}</t-radio>
-                  <t-radio value="static">{{ t('pages.apisixRouteEdit.step1.proxyRewrite.host.static') }}</t-radio>
-                </div>
-              </t-radio-group>
+            <t-radio-group v-model="proxyRewrite.hostType">
+              <t-radio value="keep">{{ t('pages.apisixRouteEdit.step1.proxyRewrite.host.keep') }}</t-radio>
+              <t-radio value="static">{{ t('pages.apisixRouteEdit.step1.proxyRewrite.host.static') }}</t-radio>
+            </t-radio-group>
+          </t-form-item>
 
-              <template v-if="proxyRewrite.hostType === 'static'">
-                <t-form-item
-                  v-if="proxyRewrite.hostType === 'static'"
-                  :label="t('pages.apisixRouteEdit.step1.proxyRewrite.host.newHost')"
-                  name="proxyRewrite.host"
-                  class="form-item-spacing"
-                >
-                  <t-input
-                    v-model="proxyRewrite.host"
-                    class="input-field"
-                    :placeholder="t('pages.apisixRouteEdit.step1.proxyRewrite.host.newHostPlaceholder')"
-                  />
-                </t-form-item>
-              </template>
-            </div>
+          <t-form-item
+            v-if="proxyRewrite.hostType === 'static'"
+            :label="t('pages.apisixRouteEdit.step1.proxyRewrite.host.newHost')"
+            name="proxyRewrite.host"
+          >
+            <t-input
+              v-model="proxyRewrite.host"
+              style="width: 480px"
+              :placeholder="t('pages.apisixRouteEdit.step1.proxyRewrite.host.newHostPlaceholder')"
+            />
           </t-form-item>
 
           <!-- HTTP方法改写 -->
           <t-form-item :label="t('pages.apisixRouteEdit.step1.proxyRewrite.methodRewrite.label')">
-            <t-select v-model="proxyRewrite.method" class="method-rewrite-select">
+            <t-select v-model="proxyRewrite.method" class="method-rewrite-select" :style="{ width: '480px' }">
               <t-option value="">{{ t('pages.apisixRouteEdit.step1.proxyRewrite.methodRewrite.keep') }}</t-option>
               <t-option v-for="(item, index) in METHOD_OPTIONS" :key="index" :value="item.value" :label="item.label">
                 {{ item.label }}

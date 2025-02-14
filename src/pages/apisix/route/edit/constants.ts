@@ -4,7 +4,6 @@ import { FormRule } from 'tdesign-vue-next';
 
 import { t } from '@/locales';
 
-// 基础验证规则
 export const FORM_RULES_1: Record<string, FormRule[]> = {
   uri: [
     {

@@ -87,8 +87,6 @@
           <t-divider align="left">{{ t('pages.apisixRouteEdit.step1.proxyRewriteTitle') }}</t-divider>
 
           <!-- 路径改写 -->
-          <!-- 路径改写 -->
-          <!-- 1) 在一个 <t-form-item> 中放单选组，实现“保持原样/静态改写/正则改写”互斥选择 -->
           <t-form-item :label="t('pages.apisixRouteEdit.step1.proxyRewrite.uri.label')">
             <t-radio-group v-model="proxyRewrite.uriType">
               <t-radio value="keep">{{ t('pages.apisixRouteEdit.step1.proxyRewrite.uri.keep') }}</t-radio>
@@ -97,7 +95,6 @@
             </t-radio-group>
           </t-form-item>
 
-          <!-- 2) 如果选中“静态改写”，则显示“新路径”输入框 -->
           <t-form-item
             v-if="proxyRewrite.uriType === 'static'"
             :label="t('pages.apisixRouteEdit.step1.proxyRewrite.uri.newPath')"
@@ -110,7 +107,6 @@
             />
           </t-form-item>
 
-          <!-- 3) 如果选中“正则改写”，则分别显示“匹配正则”和“替换模板”两个输入框 -->
           <t-form-item
             v-if="proxyRewrite.uriType === 'regex'"
             :label="t('pages.apisixRouteEdit.step1.proxyRewrite.uri.regexMatch')"

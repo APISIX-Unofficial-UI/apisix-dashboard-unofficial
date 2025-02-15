@@ -33,6 +33,7 @@ export default {
     upstream: '上游',
     proxyRewriteTitle: '请求改写',
     proxyRewrite: {
+      description: '请求改写功能由proxy-rewrite插件提供',
       uri: {
         label: '路径改写',
         keep: '保持原样',

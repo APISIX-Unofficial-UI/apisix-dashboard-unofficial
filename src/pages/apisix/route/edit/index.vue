@@ -84,7 +84,14 @@
             />
           </t-form-item>
 
-          <t-divider align="left">{{ t('pages.apisixRouteEdit.step1.proxyRewriteTitle') }}</t-divider>
+          <t-divider align="left" class="divider-with-description">
+            <div style="display: flex; align-items: center; gap: 8px">
+              {{ t('pages.apisixRouteEdit.step1.proxyRewriteTitle') }}
+              <span style="font-size: 12px; color: #999; margin-left: 4px">
+                {{ t('pages.apisixRouteEdit.step1.proxyRewrite.description') }}
+              </span>
+            </div>
+          </t-divider>
 
           <!-- 路径改写 -->
           <t-form-item :label="t('pages.apisixRouteEdit.step1.proxyRewrite.uri.label')">

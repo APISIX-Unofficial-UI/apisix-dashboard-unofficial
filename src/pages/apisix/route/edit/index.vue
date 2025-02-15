@@ -85,9 +85,9 @@
           </t-form-item>
 
           <t-divider align="left" class="divider-with-description">
-            <div style="display: flex; align-items: center; gap: 8px">
+            <div style="display: flex; align-items: center; gap: 16px">
               {{ t('pages.apisixRouteEdit.step1.proxyRewriteTitle') }}
-              <span style="font-size: 12px; color: #999; margin-left: 4px">
+              <span style="font-size: 12px; color: #999">
                 {{ t('pages.apisixRouteEdit.step1.proxyRewrite.description') }}
               </span>
             </div>

@@ -119,8 +119,13 @@
       </p>
     </t-dialog>
 
-    <t-drawer v-model:visible="drawerVisible" :header="drawerHeader" :on-confirm="onDrawerClickConfirm" size="medium">
-      <code-editor v-model:value="drawerBody" language="json" />
+    <t-drawer v-model:visible="drawerVisible" :header="drawerHeader" size="medium">
+      <code-editor v-model:value="drawerBody" language="json" :options="{ readOnly: true }" />
+      <template #footer>
+        <t-button theme="primary" @click="drawerVisible = false">
+          {{ t('pages.apisixRoute.viewConfirm') }}
+        </t-button>
+      </template>
     </t-drawer>
   </div>
 </template>
@@ -136,7 +141,7 @@ import { AxiosPromise } from 'axios';
 import dayjs from 'dayjs';
 import { SearchIcon } from 'tdesign-icons-vue-next';
 import { BaseTableCellParams, MessagePlugin, SwitchValue, TableProps } from 'tdesign-vue-next';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onActivated, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { RouteApi } from '@/api/apisix/admin';
@@ -311,6 +316,10 @@ const fetchData = async () => {
 
 const deleteIdx = ref<number[]>([]);
 
+onActivated(() => {
+  fetchData();
+});
+
 onMounted(() => {
   fetchData();
 });
@@ -391,15 +400,6 @@ const headerAffixedTop = computed(
 const drawerVisible = ref(false);
 const drawerHeader = ref('');
 const drawerBody = ref('');
-
-const onDrawerClickConfirm = () => {
-  MessagePlugin.info('数据保存中...', 1000); // TODO impl
-  const timer = setTimeout(() => {
-    clearTimeout(timer);
-    drawerVisible.value = false;
-    MessagePlugin.info('数据保存成功!');
-  }, 1000);
-};
 
 const statusSwitchLoading = ref<Record<string, any>>({});
 const updateStatus = async (id: string, status: SwitchValue) => {

@@ -3,6 +3,7 @@ export default {
   create: '新建',
   selectedCount: '已选 {num} 项',
   placeholder: '请输入内容搜索TODO',
+  viewConfirm: '确定',
   operation: '操作',
   operations: {
     view: '查看',

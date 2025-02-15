@@ -141,7 +141,7 @@ import { AxiosPromise } from 'axios';
 import dayjs from 'dayjs';
 import { SearchIcon } from 'tdesign-icons-vue-next';
 import { BaseTableCellParams, MessagePlugin, SwitchValue, TableProps } from 'tdesign-vue-next';
-import { computed, onActivated, onMounted, ref } from 'vue';
+import { computed, onActivated, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { RouteApi } from '@/api/apisix/admin';
@@ -317,10 +317,6 @@ const fetchData = async () => {
 const deleteIdx = ref<number[]>([]);
 
 onActivated(() => {
-  fetchData();
-});
-
-onMounted(() => {
   fetchData();
 });
 

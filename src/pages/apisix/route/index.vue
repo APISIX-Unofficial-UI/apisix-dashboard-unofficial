@@ -72,12 +72,12 @@
 
         <!-- eslint-disable-next-line vue/valid-v-slot -->
         <template #value.create_time="{ row }">
-          {{ dayjs.unix(row.value.create_time).format('L LT') }}
+          {{ dayjs.unix(row.value.create_time).format('YYYY-MM-DD HH:mm:ss') }}
         </template>
 
         <!-- eslint-disable-next-line vue/valid-v-slot -->
         <template #value.update_time="{ row }">
-          {{ dayjs.unix(row.value.update_time).format('L LT') }}
+          {{ dayjs.unix(row.value.update_time).format('YYYY-MM-DD HH:mm:ss') }}
         </template>
 
         <template #op="slotProps: BaseTableCellParams<Item>">

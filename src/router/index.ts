@@ -1,29 +1,25 @@
 import uniq from 'lodash/uniq';
 import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router';
 
-// 导入homepage相关固定路由
-const homepageModules = import.meta.glob('./modules/**/homepage.ts', { eager: true });
-
 // 导入modules非homepage相关固定路由
-const fixedModules = import.meta.glob('./modules/**/!(homepage).ts', { eager: true });
+const fixedModules = import.meta.glob('./modules/**/*.ts', { eager: true });
 
 // 其他固定路由
 const defaultRouterList: Array<RouteRecordRaw> = [
   {
-    path: '/login',
+    path: '//login',
     name: 'login',
     component: () => import('@/pages/login/index.vue'),
   },
   {
-    path: '/',
-    redirect: '/dashboard/base',
+    path: '//',
+    redirect: '/apisix',
   },
 ];
 // 存放固定路由
-export const homepageRouterList: Array<RouteRecordRaw> = mapModuleRouterList(homepageModules);
 export const fixedRouterList: Array<RouteRecordRaw> = mapModuleRouterList(fixedModules);
 
-export const allRoutes = [...homepageRouterList, ...fixedRouterList, ...defaultRouterList];
+export const allRoutes = [...fixedRouterList, ...defaultRouterList];
 
 // 固定路由模块转换为路由
 export function mapModuleRouterList(modules: Record<string, unknown>): Array<RouteRecordRaw> {

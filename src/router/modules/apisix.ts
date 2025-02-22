@@ -10,6 +10,7 @@ export default [
     redirect: '/apisix/route',
     name: 'apisix',
     meta: {
+      flat: true,
       title: {
         zh_CN: 'APISIX',
         en_US: 'APISIX',

@@ -15,6 +15,9 @@
           {{ renderMenuTitle(item.title) }}
         </t-menu-item>
       </template>
+      <template v-else-if="item.meta?.flat && item.children">
+        <menu-content :nav-data="item.children" />
+      </template>
       <t-submenu v-else :name="item.path" :value="item.path" :title="renderMenuTitle(item.title)">
         <template #icon>
           <component :is="menuIcon(item)" class="t-icon"></component>

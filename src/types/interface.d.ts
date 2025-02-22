@@ -12,6 +12,7 @@ export interface RouteMeta {
   keepAlive?: boolean;
   frameSrc?: string;
   frameBlank?: boolean;
+  flat?: boolean; // 展平菜单
 }
 
 export interface MenuRoute {

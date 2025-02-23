@@ -39517,8 +39517,10 @@ paths:
               - protos
       requestBody:
         content:
-          application/json:
-            schema: application/json
+          'application/json':
+            schema: 
+              type: object
+              additionalProperties: true
             example:
               uri: 1980
               upstream:

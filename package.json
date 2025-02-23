@@ -43,6 +43,7 @@
     "@types/echarts": "^4.9.21",
     "@types/lodash": "^4.17.6",
     "@types/mockjs": "^1.0.10",
+    "@types/node": "^22.13.5",
     "@types/nprogress": "^0.2.3",
     "@types/qs": "^6.9.11",
     "@typescript-eslint/eslint-plugin": "^6.21.0",

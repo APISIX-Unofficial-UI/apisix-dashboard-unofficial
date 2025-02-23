@@ -5,12 +5,13 @@ all: typescript-axios
 
 .PHONY: typescript-axios
 typescript-axios:
-	docker run --rm -v "${PWD}:/local" openapitools/openapi-generator-cli:v7.7.0 generate \
-		-i /local/apisix-control-3.9.0.yaml \
+	docker run --rm -v "${PWD}:/local" openapitools/openapi-generator-cli:v7.11.0 generate \
+		-i /local/apisix-control-3.11.0.yaml \
 		-g typescript-axios \
 		-o /local/typescript-axios \
 		-c /local/typescript-axios.yaml \
-		--skip-validate-spec
+		--skip-validate-spec \
+		--inline-schema-options RESOLVE_INLINE_ENUMS=true
 
 .PHONY: clean
 clean:

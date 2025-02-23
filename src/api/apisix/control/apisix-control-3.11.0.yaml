@@ -6,7 +6,7 @@ info:
     to the endpoints listed below, certain
     [plugins](/apisix/key-concepts/plugins), such as `server-info`, can add
     additional endpoints to control API.
-  version: 3.9.0
+  version: 3.11.0
 tags:
   - name: Schema
     description: >-
@@ -612,7 +612,7 @@ paths:
       deprecated: false
       description: >-
         Hot reload plugins for changes to the plugin list in [configuration
-        files](/apisix/reference/configuration-files#config-defaultyaml-and-configyaml)
+        files](/apisix/reference/configuration-files#configyaml-and-configyamlexample)
         or plugin source files to take effect.
       tags:
         - Plugin

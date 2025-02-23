@@ -11,7 +11,7 @@ const CWD = process.cwd();
 // https://vitejs.dev/config/
 export default ({ mode }: ConfigEnv): UserConfig => {
   const {
-    VITE_IS_REQUEST_PROXY,
+    VITE_ENABLE_VITE_PROXY,
     VITE_BASE_URL,
     VITE_APISIX_ADMIN_API_ENDPOINT,
     VITE_APISIX_ADMIN_API_PROXY_ENDPOINT,
@@ -72,9 +72,7 @@ export default ({ mode }: ConfigEnv): UserConfig => {
       host: '0.0.0.0',
       // 项目是否启动请求代理
       proxy:
-        // tips: 如果VITE_IS_REQUEST_PROXY为true则采用该配置文件中的地址请求，会绕过vite.config.js中设置的代理
-        // NOTE: 仔细看字👆，tdesign不知道为什么起这个变量名
-        VITE_IS_REQUEST_PROXY !== 'true'
+        VITE_ENABLE_VITE_PROXY === 'true'
           ? {
               // apisix admin
               [VITE_APISIX_ADMIN_API_PROXY_ENDPOINT]: {

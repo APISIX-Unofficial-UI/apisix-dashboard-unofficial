@@ -72,15 +72,15 @@ const userStore = useUserStore();
 const env = import.meta.env.MODE || 'development';
 
 const INITIAL_DATA = {
-  // 如果是mock模式 或 没启用直连代理
+  // 如果是mock模式 或 启用Vite代理
   apisixAdminEndpoint:
-    env === 'mock' || import.meta.env.VITE_IS_REQUEST_PROXY !== 'true'
-      ? import.meta.env.VITE_APISIX_ADMIN_API_PROXY_ENDPOINT // 就不配置host 会走本地Mock拦截 或 Vite 代理
+    env === 'mock' || import.meta.env.VITE_ENABLE_VITE_PROXY === 'true'
+      ? import.meta.env.VITE_APISIX_ADMIN_API_PROXY_ENDPOINT // 走本地Mock拦截 或 Vite 代理
       : import.meta.env.VITE_APISIX_ADMIN_API_ENDPOINT, // 直连
-  // 如果是mock模式 或 没启用直连代理
+  // 如果是mock模式 或 没启用Vite代理
   apisixControlEndpoint:
-    env === 'mock' || import.meta.env.VITE_IS_REQUEST_PROXY !== 'true'
-      ? import.meta.env.VITE_APISIX_CONTROL_API_PROXY_ENDPOINT // 就不配置host 会走本地Mock拦截 或 Vite 代理
+    env === 'mock' || import.meta.env.VITE_ENABLE_VITE_PROXY === 'true'
+      ? import.meta.env.VITE_APISIX_CONTROL_API_PROXY_ENDPOINT // 走本地Mock拦截 或 Vite 代理
       : import.meta.env.VITE_APISIX_CONTROL_API_ENDPOINT, // 直连
   apisixAdminKey: '',
   keepLogin: false,

@@ -4,7 +4,7 @@ info:
   description: >-
     APISIX Admin API is a RESTful API that allows you to create and manage
     APISIX resources.
-  version: 3.9.0
+  version: 3.11.0
 tags:
   - name: Route
     description: |-
@@ -34,6 +34,12 @@ tags:
         
       See [Consumer Groups](/apisix/key-concepts/consumer-groups) for more
       information.
+  - name: Credentials
+    description: >-
+      A credential is an entity used to store authentication configurations
+      associated with consumers.  
+        
+      See [Credentials](/apisix/key-concepts/credentials) for more information.
   - name: Plugin
     description: >-
       Plugins extend base functionalities of APISIX to meet user-specific
@@ -268,8 +274,8 @@ paths:
                                     forwarded to the upstream. `pass` is used to
                                     pass the request's host to the upstream
                                     without modification. `node` sets the host
-                                    to the the host of the upstream node.
-                                    `rewrite` sets the host to the value of
+                                    to the host of the upstream node. `rewrite`
+                                    sets the host to the value of
                                     `upstream_host`.
                                 upstream_host:
                                   type: string
@@ -946,7 +952,7 @@ paths:
                         Configure the host when the request is forwarded to the
                         upstream. `pass` is used to pass the request's host to
                         the upstream without modification. `node` sets the host
-                        to the the host of the upstream node. `rewrite` sets the
+                        to the host of the upstream node. `rewrite` sets the
                         host to the value of `upstream_host`.
                     upstream_host:
                       type: string
@@ -1587,9 +1593,9 @@ paths:
                               Configure the host when the request is forwarded
                               to the upstream. `pass` is used to pass the
                               request's host to the upstream without
-                              modification. `node` sets the host to the the host
-                              of the upstream node. `rewrite` sets the host to
-                              the value of `upstream_host`.
+                              modification. `node` sets the host to the host of
+                              the upstream node. `rewrite` sets the host to the
+                              value of `upstream_host`.
                           upstream_host:
                             type: string
                           type:
@@ -2235,7 +2241,7 @@ paths:
                         Configure the host when the request is forwarded to the
                         upstream. `pass` is used to pass the request's host to
                         the upstream without modification. `node` sets the host
-                        to the the host of the upstream node. `rewrite` sets the
+                        to the host of the upstream node. `rewrite` sets the
                         host to the value of `upstream_host`.
                     upstream_host:
                       type: string
@@ -2893,9 +2899,9 @@ paths:
                               Configure the host when the request is forwarded
                               to the upstream. `pass` is used to pass the
                               request's host to the upstream without
-                              modification. `node` sets the host to the the host
-                              of the upstream node. `rewrite` sets the host to
-                              the value of `upstream_host`.
+                              modification. `node` sets the host to the host of
+                              the upstream node. `rewrite` sets the host to the
+                              value of `upstream_host`.
                           upstream_host:
                             type: string
                           type:
@@ -3572,9 +3578,9 @@ paths:
                               Configure the host when the request is forwarded
                               to the upstream. `pass` is used to pass the
                               request's host to the upstream without
-                              modification. `node` sets the host to the the host
-                              of the upstream node. `rewrite` sets the host to
-                              the value of `upstream_host`.
+                              modification. `node` sets the host to the host of
+                              the upstream node. `rewrite` sets the host to the
+                              value of `upstream_host`.
                           upstream_host:
                             type: string
                           type:
@@ -4247,7 +4253,7 @@ paths:
                         Configure the host when the request is forwarded to the
                         upstream. `pass` is used to pass the request's host to
                         the upstream without modification. `node` sets the host
-                        to the the host of the upstream node. `rewrite` sets the
+                        to the host of the upstream node. `rewrite` sets the
                         host to the value of `upstream_host`.
                     upstream_host:
                       type: string
@@ -4878,9 +4884,9 @@ paths:
                               Configure the host when the request is forwarded
                               to the upstream. `pass` is used to pass the
                               request's host to the upstream without
-                              modification. `node` sets the host to the the host
-                              of the upstream node. `rewrite` sets the host to
-                              the value of `upstream_host`.
+                              modification. `node` sets the host to the host of
+                              the upstream node. `rewrite` sets the host to the
+                              value of `upstream_host`.
                           upstream_host:
                             type: string
                           type:
@@ -5607,8 +5613,8 @@ paths:
                                     forwarded to the upstream. `pass` is used to
                                     pass the request's host to the upstream
                                     without modification. `node` sets the host
-                                    to the the host of the upstream node.
-                                    `rewrite` sets the host to the value of
+                                    to the host of the upstream node. `rewrite`
+                                    sets the host to the value of
                                     `upstream_host`.
                                 upstream_host:
                                   type: string
@@ -6115,7 +6121,7 @@ paths:
                         Configure the host when the request is forwarded to the
                         upstream. `pass` is used to pass the request's host to
                         the upstream without modification. `node` sets the host
-                        to the the host of the upstream node. `rewrite` sets the
+                        to the host of the upstream node. `rewrite` sets the
                         host to the value of `upstream_host`.
                     upstream_host:
                       type: string
@@ -6597,9 +6603,9 @@ paths:
                               Configure the host when the request is forwarded
                               to the upstream. `pass` is used to pass the
                               request's host to the upstream without
-                              modification. `node` sets the host to the the host
-                              of the upstream node. `rewrite` sets the host to
-                              the value of `upstream_host`.
+                              modification. `node` sets the host to the host of
+                              the upstream node. `rewrite` sets the host to the
+                              value of `upstream_host`.
                           upstream_host:
                             type: string
                           type:
@@ -7113,9 +7119,9 @@ paths:
                               Configure the host when the request is forwarded
                               to the upstream. `pass` is used to pass the
                               request's host to the upstream without
-                              modification. `node` sets the host to the the host
-                              of the upstream node. `rewrite` sets the host to
-                              the value of `upstream_host`.
+                              modification. `node` sets the host to the host of
+                              the upstream node. `rewrite` sets the host to the
+                              value of `upstream_host`.
                           upstream_host:
                             type: string
                           type:
@@ -7625,7 +7631,7 @@ paths:
                         Configure the host when the request is forwarded to the
                         upstream. `pass` is used to pass the request's host to
                         the upstream without modification. `node` sets the host
-                        to the the host of the upstream node. `rewrite` sets the
+                        to the host of the upstream node. `rewrite` sets the
                         host to the value of `upstream_host`.
                     upstream_host:
                       type: string
@@ -8112,9 +8118,9 @@ paths:
                               Configure the host when the request is forwarded
                               to the upstream. `pass` is used to pass the
                               request's host to the upstream without
-                              modification. `node` sets the host to the the host
-                              of the upstream node. `rewrite` sets the host to
-                              the value of `upstream_host`.
+                              modification. `node` sets the host to the host of
+                              the upstream node. `rewrite` sets the host to the
+                              value of `upstream_host`.
                           upstream_host:
                             type: string
                           type:
@@ -8620,7 +8626,7 @@ paths:
                         Configure the host when the request is forwarded to the
                         upstream. `pass` is used to pass the request's host to
                         the upstream without modification. `node` sets the host
-                        to the the host of the upstream node. `rewrite` sets the
+                        to the host of the upstream node. `rewrite` sets the
                         host to the value of `upstream_host`.
                     upstream_host:
                       type: string
@@ -9095,9 +9101,9 @@ paths:
                               Configure the host when the request is forwarded
                               to the upstream. `pass` is used to pass the
                               request's host to the upstream without
-                              modification. `node` sets the host to the the host
-                              of the upstream node. `rewrite` sets the host to
-                              the value of `upstream_host`.
+                              modification. `node` sets the host to the host of
+                              the upstream node. `rewrite` sets the host to the
+                              value of `upstream_host`.
                           upstream_host:
                             type: string
                           type:
@@ -9652,8 +9658,6 @@ paths:
             example:
               username: jack
               plugins:
-                key-auth:
-                  key: auth-one
                 limit-count:
                   count: 2
                   time_window: 60
@@ -9711,8 +9715,6 @@ paths:
                     key: /apisix/consumers/jack
                     value:
                       plugins:
-                        key-auth:
-                          key: auth-one
                         limit-count:
                           time_window: 60
                           rejected_code: 503
@@ -9811,8 +9813,6 @@ paths:
                               allow_degradation: false
                               show_limit_quota_header: true
                               policy: local
-                            key-auth:
-                              key: auth-one
                           username: jack
                           create_time: 1683164776
                           update_time: 1684289832
@@ -9903,8 +9903,6 @@ paths:
                           allow_degradation: false
                           show_limit_quota_header: true
                           policy: local
-                        key-auth:
-                          key: auth-one
                       username: jack
                       create_time: 1683164776
                       update_time: 1684289832
@@ -10010,9 +10008,9 @@ paths:
                                 Configure the host when the request is forwarded
                                 to the upstream. `pass` is used to pass the
                                 request's host to the upstream without
-                                modification. `node` sets the host to the the
-                                host of the upstream node. `rewrite` sets the
-                                host to the value of `upstream_host`.
+                                modification. `node` sets the host to the host
+                                of the upstream node. `rewrite` sets the host to
+                                the value of `upstream_host`.
                             upstream_host:
                               type: string
                             type:
@@ -10383,6 +10381,9 @@ paths:
                             create_time:
                               type: integer
                           type: object
+                          oneOf:
+                            - type: string
+                            - type: string
                         key:
                           type: string
                         modifiedIndex:
@@ -10481,8 +10482,8 @@ paths:
                     Configure the host when the request is forwarded to the
                     upstream. `pass` is used to pass the request's host to the
                     upstream without modification. `node` sets the host to the
-                    the host of the upstream node. `rewrite` sets the host to
-                    the value of `upstream_host`.
+                    host of the upstream node. `rewrite` sets the host to the
+                    value of `upstream_host`.
                 upstream_host:
                   type: string
                 type:
@@ -10906,9 +10907,8 @@ paths:
                           Configure the host when the request is forwarded to
                           the upstream. `pass` is used to pass the request's
                           host to the upstream without modification. `node` sets
-                          the host to the the host of the upstream node.
-                          `rewrite` sets the host to the value of
-                          `upstream_host`.
+                          the host to the host of the upstream node. `rewrite`
+                          sets the host to the value of `upstream_host`.
                       upstream_host:
                         type: string
                       type:
@@ -11353,8 +11353,8 @@ paths:
                     Configure the host when the request is forwarded to the
                     upstream. `pass` is used to pass the request's host to the
                     upstream without modification. `node` sets the host to the
-                    the host of the upstream node. `rewrite` sets the host to
-                    the value of `upstream_host`.
+                    host of the upstream node. `rewrite` sets the host to the
+                    value of `upstream_host`.
                 upstream_host:
                   type: string
                 type:
@@ -11769,9 +11769,8 @@ paths:
                           Configure the host when the request is forwarded to
                           the upstream. `pass` is used to pass the request's
                           host to the upstream without modification. `node` sets
-                          the host to the the host of the upstream node.
-                          `rewrite` sets the host to the value of
-                          `upstream_host`.
+                          the host to the host of the upstream node. `rewrite`
+                          sets the host to the value of `upstream_host`.
                       upstream_host:
                         type: string
                       type:
@@ -12248,9 +12247,8 @@ paths:
                           Configure the host when the request is forwarded to
                           the upstream. `pass` is used to pass the request's
                           host to the upstream without modification. `node` sets
-                          the host to the the host of the upstream node.
-                          `rewrite` sets the host to the value of
-                          `upstream_host`.
+                          the host to the host of the upstream node. `rewrite`
+                          sets the host to the value of `upstream_host`.
                       upstream_host:
                         type: string
                       type:
@@ -12620,6 +12618,9 @@ paths:
                       create_time:
                         type: integer
                     type: object
+                    oneOf:
+                      - type: string
+                      - type: string
                   key:
                     type: string
                   modifiedIndex:
@@ -12741,8 +12742,8 @@ paths:
                     Configure the host when the request is forwarded to the
                     upstream. `pass` is used to pass the request's host to the
                     upstream without modification. `node` sets the host to the
-                    the host of the upstream node. `rewrite` sets the host to
-                    the value of `upstream_host`.
+                    host of the upstream node. `rewrite` sets the host to the
+                    value of `upstream_host`.
                 upstream_host:
                   type: string
                 type:
@@ -13166,9 +13167,8 @@ paths:
                           Configure the host when the request is forwarded to
                           the upstream. `pass` is used to pass the request's
                           host to the upstream without modification. `node` sets
-                          the host to the the host of the upstream node.
-                          `rewrite` sets the host to the value of
-                          `upstream_host`.
+                          the host to the host of the upstream node. `rewrite`
+                          sets the host to the value of `upstream_host`.
                       upstream_host:
                         type: string
                       type:
@@ -14100,6 +14100,7 @@ paths:
                   items:
                     type: string
                     enum:
+                      - TLSv1.1
                       - TLSv1.2
                       - TLSv1.3
                   type: array
@@ -15341,6 +15342,330 @@ paths:
                   summary: Successful Example
                   value:
                     key: /apisix/consumer_groups/company_a
+                    deleted: '1'
+        '404':
+          description: Key not found
+          content: {}
+  /apisix/admin/consumers/{consumer}/credentials:
+    get:
+      summary: Get All Credentials of a Consumer
+      deprecated: false
+      description: Get all configured credentials of a consumer.
+      tags:
+        - Credentials
+      parameters:
+        - name: consumer
+          in: path
+          description: Specified consumer username.
+          required: true
+          example: john
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  list:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        value:
+                          properties:
+                            id:
+                              anyOf:
+                                - type: string
+                                  minLength: 1
+                                  maxLength: 64
+                                  pattern: ^[a-zA-Z0-9-_.]+$
+                                - minimum: 1
+                                  type: integer
+                            plugins:
+                              type: object
+                              properties: {}
+                            desc:
+                              maxLength: 256
+                              type: string
+                            labels:
+                              type: object
+                              patternProperties:
+                                .*:
+                                  minLength: 1
+                                  maxLength: 64
+                                  pattern: ^\S+$
+                                  type: string
+                                  description: value of label
+                              description: Key-value pairs to specify attributes.
+                              properties: {}
+                            update_time:
+                              type: integer
+                            create_time:
+                              type: integer
+                          type: object
+                          required:
+                            - id
+                            - plugins
+                        key:
+                          type: string
+                        modifiedIndex:
+                          type: integer
+                        createdIndex:
+                          type: integer
+                  total:
+                    type: integer
+              examples:
+                '1':
+                  summary: Successful Example
+                  value:
+                    total: 1
+                    list:
+                      - total: 2
+                        list:
+                          - key: >-
+                              /apisix/consumers/john/credentials/cred-john-basic-auth
+                            value:
+                              update_time: 1725991703
+                              id: cred-john-basic-auth
+                              plugins:
+                                basic-auth:
+                                  password: john-pass
+                                  username: john-key
+                              create_time: 1725991529
+                            createdIndex: 42
+                            modifiedIndex: 44
+                          - key: >-
+                              /apisix/consumers/john/credentials/cred-john-key-auth
+                            value:
+                              update_time: 1725991703
+                              id: cred-john-key-auth
+                              plugins:
+                                key-auth:
+                                  key: john-key
+                              create_time: 1725991703
+                            createdIndex: 43
+                            modifiedIndex: 43
+  /apisix/admin/consumers/{consumer}/credentials/{id}:
+    get:
+      summary: Get Credential by ID
+      deprecated: false
+      description: Get credential of a consumer by ID.
+      tags:
+        - Credentials
+      parameters:
+        - name: consumer
+          in: path
+          description: Specified consumer username.
+          required: true
+          example: john
+          schema:
+            type: string
+        - name: id
+          in: path
+          description: Specified credential ID.
+          required: true
+          example: john-key-auth-cred
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  list:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        value:
+                          properties:
+                            id:
+                              anyOf:
+                                - type: string
+                                  minLength: 1
+                                  maxLength: 64
+                                  pattern: ^[a-zA-Z0-9-_.]+$
+                                - minimum: 1
+                                  type: integer
+                            plugins:
+                              type: object
+                              properties: {}
+                            desc:
+                              maxLength: 256
+                              type: string
+                            labels:
+                              type: object
+                              patternProperties:
+                                .*:
+                                  minLength: 1
+                                  maxLength: 64
+                                  pattern: ^\S+$
+                                  type: string
+                                  description: value of label
+                              description: Key-value pairs to specify attributes.
+                              properties: {}
+                            update_time:
+                              type: integer
+                            create_time:
+                              type: integer
+                          type: object
+                          required:
+                            - id
+                            - plugins
+                        key:
+                          type: string
+                        modifiedIndex:
+                          type: integer
+                        createdIndex:
+                          type: integer
+                  total:
+                    type: integer
+              examples:
+                '1':
+                  summary: Successful Example
+                  value:
+                    total: 1
+                    list:
+                      - key: >-
+                          /apisix/consumers/john/credentials/cred-john-basic-auth
+                        value:
+                          update_time: 1725991529
+                          id: cred-john-basic-auth
+                          plugins:
+                            basic-auth:
+                              password: john-pass
+                              username: john-key
+                          create_time: 1725991529
+                        createdIndex: 42
+                        modifiedIndex: 42
+    put:
+      summary: Create Credential by ID
+      deprecated: false
+      description: Create a credential by ID.
+      tags:
+        - Credentials
+      parameters:
+        - name: consumer
+          in: path
+          description: Specified consumer username.
+          required: true
+          example: john
+          schema:
+            type: string
+        - name: id
+          in: path
+          description: Specified credential ID.
+          required: true
+          example: john-key-auth-cred
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                plugins:
+                  type: object
+                  description: >-
+                    `basic-auth`, `key-auth`, `hmac-auth` or `jwt-auth`
+                    configurations.
+                label:
+                  type: object
+                  properties: {}
+                  description: >-
+                    Key-value pairs of custom labels. When the `custom_id` label
+                    is set and if a request is authenticated, the value will be
+                    forwarded to the upstream service in the `X-Custom-ID`
+                    header.
+                name:
+                  type: string
+                  maxLength: 100
+                  minLength: 1
+                desc:
+                  maxLength: 256
+                  type: string
+                  description: Description for the credential.
+              examples:
+                - plugins:
+                    key-auth:
+                      key: john-key
+            example:
+              plugins:
+                key-auth:
+                  key: john-key
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  key:
+                    type: string
+                  value:
+                    type: object
+                    properties: {}
+              examples:
+                '1':
+                  summary: Successful Example
+                  value:
+                    key: /apisix/consumers/john/credentials/cred-john-key-auth
+                    value:
+                      create_time: 1725991703
+                      id: cred-john-key-auth
+                      plugins:
+                        key-auth:
+                          key: john-key
+                      update_time: 1725991703
+        '400':
+          description: Invalid configuration
+          content: {}
+    delete:
+      summary: Delete Credential by ID
+      deprecated: false
+      description: Delete a credential by ID.
+      tags:
+        - Credentials
+      parameters:
+        - name: consumer
+          in: path
+          description: Specified consumer username.
+          required: true
+          example: john
+          schema:
+            type: string
+        - name: id
+          in: path
+          description: Specified credential ID.
+          required: true
+          example: john-key-auth-cred
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  key:
+                    type: string
+                  deleted:
+                    type: string
+              examples:
+                '1':
+                  summary: Successful Example
+                  value:
+                    key: /apisix/consumers/john/credentials/cred-john-key-auth
                     deleted: '1'
         '404':
           description: Key not found
@@ -35091,8 +35416,8 @@ paths:
                                     forwarded to the upstream. `pass` is used to
                                     pass the request's host to the upstream
                                     without modification. `node` sets the host
-                                    to the the host of the upstream node.
-                                    `rewrite` sets the host to the value of
+                                    to the host of the upstream node. `rewrite`
+                                    sets the host to the value of
                                     `upstream_host`.
                                 upstream_host:
                                   type: string
@@ -35657,7 +35982,7 @@ paths:
                         Configure the host when the request is forwarded to the
                         upstream. `pass` is used to pass the request's host to
                         the upstream without modification. `node` sets the host
-                        to the the host of the upstream node. `rewrite` sets the
+                        to the host of the upstream node. `rewrite` sets the
                         host to the value of `upstream_host`.
                     upstream_host:
                       type: string
@@ -36187,9 +36512,9 @@ paths:
                               Configure the host when the request is forwarded
                               to the upstream. `pass` is used to pass the
                               request's host to the upstream without
-                              modification. `node` sets the host to the the host
-                              of the upstream node. `rewrite` sets the host to
-                              the value of `upstream_host`.
+                              modification. `node` sets the host to the host of
+                              the upstream node. `rewrite` sets the host to the
+                              value of `upstream_host`.
                           upstream_host:
                             type: string
                           type:
@@ -36750,8 +37075,8 @@ paths:
                                   forwarded to the upstream. `pass` is used to
                                   pass the request's host to the upstream
                                   without modification. `node` sets the host to
-                                  the the host of the upstream node. `rewrite`
-                                  sets the host to the value of `upstream_host`.
+                                  the host of the upstream node. `rewrite` sets
+                                  the host to the value of `upstream_host`.
                               upstream_host:
                                 type: string
                               type:
@@ -37313,7 +37638,7 @@ paths:
                         Configure the host when the request is forwarded to the
                         upstream. `pass` is used to pass the request's host to
                         the upstream without modification. `node` sets the host
-                        to the the host of the upstream node. `rewrite` sets the
+                        to the host of the upstream node. `rewrite` sets the
                         host to the value of `upstream_host`.
                     upstream_host:
                       type: string
@@ -37843,9 +38168,9 @@ paths:
                               Configure the host when the request is forwarded
                               to the upstream. `pass` is used to pass the
                               request's host to the upstream without
-                              modification. `node` sets the host to the the host
-                              of the upstream node. `rewrite` sets the host to
-                              the value of `upstream_host`.
+                              modification. `node` sets the host to the host of
+                              the upstream node. `rewrite` sets the host to the
+                              value of `upstream_host`.
                           upstream_host:
                             type: string
                           type:
@@ -38365,11 +38690,15 @@ paths:
       parameters:
         - name: secretmanager
           in: path
-          description: Any secret manager supported, e.g. vault.
+          description: Secret manager.
           required: true
           example: ''
           schema:
             type: string
+            enum:
+              - vault
+              - aws
+              - gcp
         - name: id
           in: path
           description: The specified secrets ID.
@@ -38431,19 +38760,23 @@ paths:
           description: Key not found
           content: {}
     put:
-      summary: Create Secrets Configuration
+      summary: Create a Secret
       deprecated: false
-      description: Create a secrete configuration with a custom ID.
+      description: Create a secret with a custom ID to obtain secret from secret manager.
       tags:
         - Secret
       parameters:
         - name: secretmanager
           in: path
-          description: Any secret manager supported, e.g. vault.
+          description: Secret manager.
           required: true
           example: ''
           schema:
             type: string
+            enum:
+              - vault
+              - aws
+              - gcp
         - name: id
           in: path
           description: The specified secrets ID.
@@ -38455,22 +38788,99 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                uri:
-                  type: string
-                prefix:
-                  type: string
-                token:
-                  type: string
-              required:
-                - uri
-                - prefix
-                - token
+              oneOf:
+                - type: object
+                  properties:
+                    uri:
+                      type: string
+                      description: Address of the Vault server.
+                    prefix:
+                      type: string
+                      description: >-
+                        Path prefix of the secret engine that Vault should route
+                        to.
+                    token:
+                      type: string
+                      description: Token used for APISIX to authenticate to Vault.
+                    namespace:
+                      type: string
+                      description: >-
+                        Used to set the
+                        [namespace](https://developer.hashicorp.com/vault/docs/enterprise/namespaces#vault-api-and-namespaces)
+                        of HashiCorp Vault Enterprise and HCP Vault.
+                  required:
+                    - uri
+                    - prefix
+                    - token
+                - type: object
+                  properties:
+                    access_key_id:
+                      type: string
+                      description: AWS access key ID.
+                    secret_access_key:
+                      type: string
+                      description: AWS secret access key.
+                    session_token:
+                      type: string
+                      description: Temporary access credential information.
+                    region:
+                      type: string
+                      default: us-east-1
+                      description: AWS region.
+                    endpoint_url:
+                      type: string
+                      description: AWS secret manager URL.
+                      example: https://secretsmanager.{region}.amazonaws.com
+                  required:
+                    - access_key_id
+                    - secret_access_key
+                - type: object
+                  properties:
+                    auth_config:
+                      type: object
+                      description: >-
+                        Authentication configurations. Either `auth_config` or
+                        `auth_file` should be configured.
+                      properties:
+                        client_email:
+                          type: string
+                          description: Email address of the Google Cloud service account.
+                        private_key:
+                          type: string
+                          description: Private key of the Google Cloud service account.
+                        project_id:
+                          type: string
+                          description: Project ID in the Google Cloud service account.
+                        token_uri:
+                          type: string
+                          default: https://oauth2.googleapis.com/token
+                          description: Token URI of the Google Cloud service account.
+                        entries_uri:
+                          type: string
+                          default: https://secretmanager.googleapis.com/v1
+                          description: API access endpoint for the Google Secrets Manager.
+                        scope:
+                          type: string
+                          default: https://www.googleapis.com/auth/cloud-platform
+                          description: >-
+                            Access scopes of the Google Cloud service account.
+                            See [OAuth 2.0 Scopes for Google
+                            APIs](https://developers.google.com/identity/protocols/oauth2/scopes).
+                    auth_file:
+                      type: string
+                      description: >-
+                        Path to the Google Cloud service account authentication
+                        JSON file. Either `auth_config` or `auth_file` should be
+                        configured.
+                    ssl_verify:
+                      type: boolean
+                      default: true
+                      description: If true, enable SSL verification.
             example:
               uri: https://localhost/vault
               prefix: /apisix/kv
               token: 343effad
+              namespace: apisix
       responses:
         '201':
           description: Created
@@ -38490,6 +38900,8 @@ paths:
                         type: string
                       token:
                         type: string
+                      namespace:
+                        type: string
                       create_time:
                         type: integer
                       update_time:
@@ -38504,6 +38916,7 @@ paths:
                       prefix: /apisix/kv
                       token: 343effad
                       uri: https://localhost/vault
+                      namespace: apisix
                       id: vault/1
                       update_time: 1684395392
                       create_time: 1684395392
@@ -38520,11 +38933,15 @@ paths:
       parameters:
         - name: secretmanager
           in: path
-          description: Any secret manager supported, e.g. vault.
+          description: Secret manager.
           required: true
           example: ''
           schema:
             type: string
+            enum:
+              - vault
+              - aws
+              - gcp
         - name: id
           in: path
           description: The specified secrets ID.
@@ -38602,11 +39019,15 @@ paths:
       parameters:
         - name: secretmanager
           in: path
-          description: Any secret manager supported, e.g. vault.
+          description: Secret manager.
           required: true
           example: ''
           schema:
             type: string
+            enum:
+              - vault
+              - aws
+              - gcp
         - name: id
           in: path
           description: The secrets id

@@ -1,6 +1,12 @@
 <template>
   <div class="plugin-config-editor">
     <h3>{{ pluginName }}</h3>
+    <t-divider dashed />
+    <t-collapse v-model:value="activePanel" expand-mutex>
+      <t-collapse-panel value="schema" :header="t('components.plugin.configEditor.config_description')">
+        <schema-info :schema="schema" />
+      </t-collapse-panel>
+    </t-collapse>
     <code-editor v-model:value="configStr" language="json" />
   </div>
 </template>
@@ -9,22 +15,28 @@
 import { ref, watch } from 'vue';
 
 import CodeEditor from '@/components/code-editor/index.vue';
+import { t } from '@/locales';
+
+import SchemaInfo from './schema-info.vue';
 
 const props = defineProps({
   pluginName: String,
   config: Object,
+  schema: Object,
 });
 
 const configStr = ref(JSON.stringify(props.config, null, 2));
+const activePanel = ref(['schema']);
 
-watch(configStr, (newStr) => {
+const getParsedConfig = () => {
   try {
-    const newConfig = JSON.parse(newStr);
-    emit('update:config', newConfig);
+    return JSON.parse(configStr.value);
   } catch (e) {
-    console.error('Invalid JSON');
+    console.error('Invalid JSON configuration');
+    return null;
   }
-});
+};
+defineExpose({ getParsedConfig });
 
 watch(
   () => props.config,
@@ -38,6 +50,11 @@ watch(
 <style lang="less" scoped>
 .plugin-config-editor {
   margin-bottom: var(--td-comp-margin-lg);
+
+  .t-collapse {
+    margin-bottom: var(--td-comp-margin-m);
+  }
+
   .t-button {
     margin-top: var(--td-comp-margin-md);
   }

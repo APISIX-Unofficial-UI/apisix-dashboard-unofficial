@@ -313,7 +313,7 @@ import { t } from '@/locales';
 import { FORM_RULES_1, FORM_RULES_2, FORM_RULES_3, METHOD_OPTIONS } from './constants';
 
 let INITIAL_DATA: ApisixAdminRoutesPostRequest = {
-  plugins: {}, // 添加默认的空 plugins 对象
+  plugins: {},
 };
 
 const formData = ref<ApisixAdminRoutesPostRequest>(INITIAL_DATA);

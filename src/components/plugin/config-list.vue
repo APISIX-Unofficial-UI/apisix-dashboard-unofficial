@@ -25,17 +25,18 @@
 
     <!-- 插件选择对话框 -->
     <t-dialog v-model:visible="selectionDialogVisible" header="选择插件" @confirm="onSelectPlugin">
-      <t-select v-model="selectedPlugin" :options="availablePluginOptions" placeholder="请选择插件" />
+      <t-select v-model="selectedPlugin" filterable :options="availablePluginOptions" placeholder="请选择插件" />
     </t-dialog>
 
-    <!-- 编辑对话框 -->
-    <t-dialog v-model:visible="editDialogVisible" header="编辑插件配置" @confirm="onEditConfirm">
+    <!-- 编辑抽屉，使用抽屉自身的确定、取消按钮 -->
+    <t-drawer v-model:visible="editDialogVisible" size="medium" @confirm="onEditConfirm" @cancel="onEditCancel">
+      <template #header>编辑插件配置</template>
       <plugin-config-editor
         :plugin-name="currentEditingPlugin"
         :config="tempConfig.config || {}"
         @update:config="(newConfig: Record<string, any>) => (tempConfig.config = newConfig)"
       />
-    </t-dialog>
+    </t-drawer>
   </div>
 </template>
 
@@ -45,8 +46,11 @@ import { computed, onMounted, ref } from 'vue';
 
 import { PluginApi } from '@/api/apisix/admin';
 import PluginConfigEditor from '@/components/plugin/config-editor.vue';
+import { fetchPluginSchema, generateDefaultFromSchema, validateConfigWithSchema } from '@/utils/plugin-schema';
 
 defineOptions({ name: 'PluginConfigList' });
+
+const currentPluginSchema = ref<any>(null);
 
 interface PluginEntry {
   config: Record<string, any>;
@@ -72,8 +76,9 @@ const columns = [
 const tableData = computed(() => {
   return Object.entries(props.plugins || {}).map(([name, pluginEntry]) => {
     const config = pluginEntry.config || {};
-    const meta = config._meta || {};
-    // 默认启用：meta.disable 没有定义或不为 true
+    const meta = config._meta || {
+      disable: false,
+    };
     return {
       name,
       config,
@@ -84,13 +89,11 @@ const tableData = computed(() => {
 
 const togglePluginStatus = (pluginName: string, enabled: boolean) => {
   const updatedPlugins = { ...props.plugins };
-
   if (!updatedPlugins[pluginName]) {
     updatedPlugins[pluginName] = { config: {} };
   }
   const currentConfig = updatedPlugins[pluginName].config || {};
   const currentMeta = currentConfig._meta || {};
-
   updatedPlugins[pluginName].config = {
     ...currentConfig,
     _meta: {
@@ -98,7 +101,6 @@ const togglePluginStatus = (pluginName: string, enabled: boolean) => {
       disable: !enabled,
     },
   };
-
   emit('update:plugins', updatedPlugins);
 };
 
@@ -117,37 +119,60 @@ const availablePluginOptions = computed(() =>
   availablePlugins.value.filter((plugin) => !props.plugins[plugin]).map((plugin) => ({ label: plugin, value: plugin })),
 );
 
-// 选择插件后，打开编辑对话框，并初始化 tempConfig
-const onSelectPlugin = () => {
+// 修改：选择插件后，通过工具方法获取 schema 并生成默认配置
+const onSelectPlugin = async () => {
   if (selectedPlugin.value) {
-    currentEditingPlugin.value = selectedPlugin.value;
-    tempConfig = { config: {}, status: 1 }; // 新插件初始配置为空对象，默认启用
+    try {
+      const schema = await fetchPluginSchema(selectedPlugin.value);
+      currentPluginSchema.value = schema;
+      tempConfig = { config: generateDefaultFromSchema(schema), status: 1 };
+      currentEditingPlugin.value = selectedPlugin.value;
+    } catch (error) {
+      console.error('获取插件 schema 出错:', error);
+      return;
+    }
     selectionDialogVisible.value = false;
     editDialogVisible.value = true;
     selectedPlugin.value = '';
   }
 };
 
-// 编辑已有插件时，打开编辑对话框并载入配置
-const openEditDialog = (pluginName: string) => {
+// 修改：编辑插件时，同步获取 schema
+const openEditDialog = async (pluginName: string) => {
+  try {
+    const schema = await fetchPluginSchema(pluginName);
+    currentPluginSchema.value = schema;
+  } catch (error) {
+    console.error('获取插件 schema 出错:', error);
+    return;
+  }
   currentEditingPlugin.value = pluginName;
   tempConfig = { ...props.plugins[pluginName] };
   editDialogVisible.value = true;
 };
 
-// 编辑对话框确认后，更新或新增插件配置
-const onEditConfirm = () => {
+// 修改：保存前根据 schema 校验配置
+const onEditConfirm = async () => {
+  if (currentPluginSchema.value) {
+    const { valid, errors } = await validateConfigWithSchema(tempConfig.config, currentPluginSchema.value);
+    if (!valid) {
+      alert(`配置不合法: ${JSON.stringify(errors)}`);
+      return;
+    }
+  }
   const updatedPlugins = { ...props.plugins };
   updatedPlugins[currentEditingPlugin.value] = {
     ...tempConfig,
-    status: tempConfig.status ?? 1, // 确保有status字段，默认为启用
+    status: tempConfig.status ?? 1,
   };
-
   emit('update:plugins', updatedPlugins);
   editDialogVisible.value = false;
 };
 
-// 删除插件
+const onEditCancel = () => {
+  editDialogVisible.value = false;
+};
+
 const removePlugin = (pluginName: string) => {
   const updatedPlugins = { ...props.plugins };
   delete updatedPlugins[pluginName];

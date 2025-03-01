@@ -2,21 +2,18 @@
   <div class="plugin-config-editor">
     <h3>{{ pluginName }}</h3>
     <code-editor v-model:value="configStr" language="json" />
-    <t-button variant="text" theme="danger" @click="$emit('remove')"> <t-icon name="delete" /> 移除 </t-button>
   </div>
 </template>
 
 <script setup>
 import { ref, watch } from 'vue';
 
-import CodeEditor from '@/components/code-editor/index.vue'; // 新增导入
+import CodeEditor from '@/components/code-editor/index.vue';
 
 const props = defineProps({
   pluginName: String,
   config: Object,
 });
-
-const emit = defineEmits(['update:config', 'remove']);
 
 const configStr = ref(JSON.stringify(props.config, null, 2));
 

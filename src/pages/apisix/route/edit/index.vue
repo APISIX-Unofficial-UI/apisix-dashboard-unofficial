@@ -233,12 +233,16 @@
         <!-- 分步表单2 插件配置 -->
         <t-form v-show="activeStep === 2" class="step-form" :data="formData" :rules="FORM_RULES_2" @submit="onNextStep">
           <t-form-item :label="t('pages.apisixRouteEdit.step2.title')">
-            <code-editor ref="pluginEditorRef" v-model:value="pluginEditorData" language="json" />
+            <!-- 增加 update:plugins 事件监听 -->
+            <plugin-config-list
+              :plugins="formData.plugins"
+              @update:plugins="(newPlugins) => (formData.plugins = newPlugins)"
+            />
           </t-form-item>
           <t-form-item>
-            <t-button theme="default" variant="base" @click="onPreStep">{{
-              t('pages.apisixRouteEdit.preStep')
-            }}</t-button>
+            <t-button theme="default" variant="base" @click="onPreStep">
+              {{ t('pages.apisixRouteEdit.preStep') }}
+            </t-button>
             <t-button type="submit" theme="primary"> {{ t('pages.apisixRouteEdit.nextStep') }} </t-button>
           </t-form-item>
         </t-form>
@@ -303,11 +307,14 @@ import {
 } from '@/api/apisix/admin/typescript-axios';
 import UpstreamForm from '@/components/apisix/upstream-form.vue';
 import CodeEditor from '@/components/code-editor/index.vue';
+import PluginConfigList from '@/components/plugin/config-list.vue';
 import { t } from '@/locales';
 
 import { FORM_RULES_1, FORM_RULES_2, FORM_RULES_3, METHOD_OPTIONS } from './constants';
 
-let INITIAL_DATA: ApisixAdminRoutesPostRequest = {};
+let INITIAL_DATA: ApisixAdminRoutesPostRequest = {
+  plugins: {}, // 添加默认的空 plugins 对象
+};
 
 const formData = ref<ApisixAdminRoutesPostRequest>(INITIAL_DATA);
 const routeId = ref<string>('');
@@ -431,6 +438,7 @@ const fetchData = async (id: string) => {
     const res = await RouteApi.apisixAdminRoutesIdGet({ id });
     INITIAL_DATA = res.data.value;
     formData.value = cloneDeep(INITIAL_DATA);
+    formData.value.plugins = formData.value.plugins || {};
     parseProxyRewritePlugin();
   } catch (e) {
     console.error(e); // TODO Message
@@ -451,7 +459,9 @@ const onPreStep = (_e: MouseEvent) => {
 };
 const onReset = () => {
   activeStep.value = 1;
-  INITIAL_DATA = {};
+  INITIAL_DATA = {
+    plugins: {},
+  };
   formData.value = cloneDeep(INITIAL_DATA);
   routeId.value = '';
   isUpdateMode.value = false;
@@ -545,18 +555,9 @@ const onComplete = () => {
   router.back();
 };
 // 配置编辑器
-const pluginEditorRef = ref<InstanceType<typeof CodeEditor>>();
-const pluginEditorData = ref('');
 const previewEditorRef = ref<InstanceType<typeof CodeEditor>>();
 const previewEditorData = ref('');
 watch(activeStep, (newStep, oldStep) => {
-  // <!-- 分步表单2 插件配置 -->
-  if (newStep === 2) {
-    pluginEditorRef.value.loadJson(formData.value, true);
-  }
-  if (oldStep === 2) {
-    formData.value = pluginEditorRef.value.parseJson();
-  }
   // <!-- 分步表单3 预览 -->
   if (newStep === 3) {
     previewEditorRef.value.loadJson(formData.value, true);

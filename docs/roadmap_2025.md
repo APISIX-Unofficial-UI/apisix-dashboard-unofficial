@@ -1,5 +1,7 @@
 # apisix-dashboard-unofficial Roadmap 2025
 
+For english version, please see: [roadmap_2025_en.md](https://github.com/APISIX-Unofficial-UI/apisix-dashboard-unofficial/blob/main/docs/roadmap_2025_en.md)
+
 ## 启发与愿景
 
 由于官方 APISIX Dashboard 长期无人维护，且在 APISIX 3.9 及后续版本上已无法正常运行，**apisix-dashboard-unofficial** 项目旨在为 Apache APISIX 提供一个可持续发展的前端管理面板。该项目使用 **TypeScript + Vue** 技术栈开发，遵循云原生理念，虽然**非官方**，但我们希望能够将其打磨得比官方版本功能更丰富、使用体验更好、运行更可靠，真正可在生产环境中使用，让个人开发者与中小企业都能更加便捷地配置和管理 APISIX 网关。

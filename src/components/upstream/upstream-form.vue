@@ -35,7 +35,6 @@
             class="node-input"
             :placeholder="t('components.upstreamForm.nodes.hostPlaceholder')"
             required-mark
-            @change="updateNodesFromUi"
           />
           <span class="node-label">{{ t('components.upstreamForm.nodes.portLabel') }}</span>
           <t-input-number
@@ -46,7 +45,6 @@
             :max="65535"
             required-mark
             theme="normal"
-            @change="updateNodesFromUi"
           />
           <span class="node-label">{{ t('components.upstreamForm.nodes.weightLabel') }}</span>
           <t-input-number
@@ -56,7 +54,6 @@
             :min="0"
             required-mark
             theme="normal"
-            @change="updateNodesFromUi"
           />
           <t-button
             v-if="uiNodes.length > 1"
@@ -342,15 +339,27 @@ import debounce from 'lodash/debounce';
 import { FormInstanceFunctions, MessagePlugin } from 'tdesign-vue-next';
 import { reactive, ref, watch } from 'vue';
 
-// TODO(icebound): Fix here
-import { Node, Upstream } from '@/api/apisix/typing'; // Adjust path and type names as needed
+// Removed the problematic import:
+// import { Node, Upstream } from '@/api/apisix/typing';
 import { t } from '@/locales'; // Assuming your i18n setup
 
+import { DISCOVERY_TYPE_OPTIONS, LOAD_BALANCER_OPTIONS, PROTOCOL_OPTIONS } from './constants';
+
+// Define a simple interface for the UI representation of a node
+// This replaces the imported 'Node' type for internal use.
+interface UiNode {
+  host: string;
+  port: number | null;
+  weight: number;
+}
+
 // Define props and emit for v-model
+// Use Record<string, any> to accept a generic key-value object
 const props = defineProps<{
-  modelValue: Upstream | undefined | null; // Use the Upstream type
+  modelValue: Record<string, any> | undefined | null; // Accept plain object
 }>();
 
+// Emit uses a plain object structure
 const emit = defineEmits(['update:modelValue']);
 
 // --- Internal State ---
@@ -358,21 +367,23 @@ const formRef = ref<FormInstanceFunctions>();
 const isHealthCheckActive = ref(false); // Controls visibility and data structure of health checks
 const upstreamType = ref<'nodes' | 'discovery'>('nodes'); // Controls UI for nodes vs discovery
 
-// Internal representation for UI nodes (easier to manage in template)
-const uiNodes = ref<Node[]>([{ host: '', port: null, weight: 1 }]);
+// Internal representation for UI nodes using the local UiNode interface
+const uiNodes = ref<UiNode[]>([{ host: '', port: null, weight: 1 }]);
 
 // Local reactive state holding the data structure closer to APISIX schema
 // Note: localUpstreamData.nodes will store the {"host:port": weight} format
-const localUpstreamData = reactive<Upstream>(getDefaultUpstreamData());
+// Use Record<string, any> for the internal state as well
+const localUpstreamData = reactive<Record<string, any>>(getDefaultUpstreamData());
 
 // --- Helper Functions ---
 
 // Parses APISIX nodes object {"host:port": weight} into UI array [{host, port, weight}]
-function parseNodesToUi(apiNodes: Record<string, number> | undefined): Node[] {
+// Returns the local UiNode type
+function parseNodesToUi(apiNodes: Record<string, number> | undefined): UiNode[] {
   if (!apiNodes || typeof apiNodes !== 'object' || Object.keys(apiNodes).length === 0) {
     return [{ host: '', port: null, weight: 1 }]; // Return default if empty or invalid
   }
-  const parsed: Node[] = [];
+  const parsed: UiNode[] = [];
   for (const key in apiNodes) {
     if (Object.prototype.hasOwnProperty.call(apiNodes, key)) {
       const weight = apiNodes[key];
@@ -392,7 +403,8 @@ function parseNodesToUi(apiNodes: Record<string, number> | undefined): Node[] {
 }
 
 // Converts UI array [{host, port, weight}] back to APISIX object {"host:port": weight}
-function convertNodesToApi(nodesArray: Node[]): Record<string, number> | undefined {
+// Accepts the local UiNode type
+function convertNodesToApi(nodesArray: UiNode[]): Record<string, number> | undefined {
   const apiNodes: Record<string, number> = {};
   let validNodes = 0;
   nodesArray.forEach((node) => {
@@ -406,7 +418,8 @@ function convertNodesToApi(nodesArray: Node[]): Record<string, number> | undefin
 }
 
 // Gets default structure, ensuring nested objects exist for v-model bindings
-function getDefaultUpstreamData(): Upstream {
+// Returns a plain object structure (Record<string, any>)
+function getDefaultUpstreamData(): Record<string, any> {
   return {
     type: 'roundrobin',
     nodes: undefined, // Will be populated by conversion or default
@@ -451,14 +464,15 @@ watch(
   () => props.modelValue,
   (newVal) => {
     const defaults = getDefaultUpstreamData();
-    const incoming = newVal || {};
+    // Ensure incoming value is treated as a plain object
+    const incoming: Record<string, any> = newVal || {};
 
     // Determine upstream type (nodes vs discovery)
-    if (incoming.discovery_type) {
-      upstreamType.value = 'discovery';
-    } else {
-      upstreamType.value = 'nodes';
-    }
+    // if (incoming.discovery_type) {
+    //   upstreamType.value = 'discovery';
+    // } else {
+    //   upstreamType.value = 'nodes';
+    // }
 
     // Merge top-level fields
     Object.assign(localUpstreamData, {
@@ -473,19 +487,25 @@ watch(
 
     // Convert API nodes format to UI format
     if (upstreamType.value === 'nodes') {
+      // Cast incoming.nodes to the expected format for parseNodesToUi
       uiNodes.value = parseNodesToUi(incoming.nodes as Record<string, number> | undefined);
       localUpstreamData.nodes = incoming.nodes; // Keep API format in local data for now
     } else {
       uiNodes.value = [{ host: '', port: null, weight: 1 }]; // Reset UI nodes if discovery
-      localUpstreamData.nodes = undefined; // Clear API nodes if discovery
+      // localUpstreamData.nodes = undefined; // Clear API nodes if discovery
     }
 
     // Set health check switch state
+    // Use optional chaining for safety as checks might not exist
     isHealthCheckActive.value = !!localUpstreamData.checks?.active; // Enable switch if active checks exist
 
     // Ensure checks.active structure exists if switch is on but data was missing details
     if (isHealthCheckActive.value && !localUpstreamData.checks?.active) {
-      localUpstreamData.checks = { ...localUpstreamData.checks, active: { ...defaults.checks.active } };
+      // Ensure checks object exists before assigning to active
+      if (!localUpstreamData.checks) {
+        localUpstreamData.checks = {};
+      }
+      localUpstreamData.checks.active = { ...defaults.checks.active };
     } else if (isHealthCheckActive.value && localUpstreamData.checks?.active) {
       // Ensure nested healthy/unhealthy objects exist if active is present
       localUpstreamData.checks.active.healthy = {
@@ -501,7 +521,7 @@ watch(
   { immediate: true, deep: false }, // Use deep: false initially, rely on specific watchers below for deep changes
 );
 
-// Helper for deep merging checks structure
+// Helper for deep merging checks structure (accepts/returns 'any' for flexibility)
 function deepMergeChecks(defaults: any, incoming: any): any {
   if (!incoming) return defaults;
   const merged = { ...defaults };
@@ -520,7 +540,8 @@ function deepMergeChecks(defaults: any, incoming: any): any {
 
 // Debounced function to emit updates when local data changes
 const emitUpdate = debounce(() => {
-  const dataToEmit: Partial<Upstream> = JSON.parse(JSON.stringify(localUpstreamData)); // Deep clone
+  // Clone the local data to create the object to emit
+  const dataToEmit: Record<string, any> = JSON.parse(JSON.stringify(localUpstreamData)); // Deep clone
 
   // Clean up based on upstreamType
   if (upstreamType.value === 'nodes') {
@@ -549,48 +570,65 @@ const emitUpdate = debounce(() => {
     if (dataToEmit.checks?.active?.host === '') delete dataToEmit.checks.active.host;
     // ... potentially more cleanup ...
 
-    // Ensure the 'type' field exists if active checks are enabled
+    // Ensure the 'type' field exists if active checks are enabled and it's missing
     if (dataToEmit.checks?.active && !dataToEmit.checks.active.type) {
       dataToEmit.checks.active.type = 'http'; // Set default type
     }
   }
 
-  // Remove undefined top-level keys (optional, depends on API)
+  // Remove undefined top-level keys (optional, depends on API expectations)
   Object.keys(dataToEmit).forEach((key) => {
+    // Check specifically for undefined, allow null or other falsy values if intended
     if (dataToEmit[key] === undefined) {
       delete dataToEmit[key];
     }
   });
 
   console.log('Emitting:', dataToEmit);
+  // Emit the cleaned-up plain object
   emit('update:modelValue', dataToEmit);
 }, 300); // Debounce emission by 300ms
 
 // Watch deep changes in localUpstreamData (excluding nodes, handled separately)
 watch(
-  () => ({ ...localUpstreamData, nodes: undefined }), // Watch everything *except* nodes object directly
+  () => {
+    const { nodes, ...rest } = localUpstreamData;
+    return rest;
+  },
   emitUpdate,
   { deep: true },
 );
 
-// Watch for changes in the UI nodes array
-watch(uiNodes, emitUpdate, { deep: true });
+// Watch for changes in the UI nodes array and update API format
+watch(
+  uiNodes,
+  (newNodes) => {
+    // Update nodes in localUpstreamData without triggering the localUpstreamData watcher
+    const apiNodes = convertNodesToApi(newNodes);
+    if (JSON.stringify(localUpstreamData.nodes) !== JSON.stringify(apiNodes)) {
+      localUpstreamData.nodes = apiNodes;
+      emitUpdate();
+    }
+  },
+  { deep: true },
+);
 
 // Watch the health check switch
 watch(isHealthCheckActive, (isActive) => {
   if (isActive) {
     // If activating, ensure the checks.active structure exists
+    const defaults = getDefaultUpstreamData(); // Get defaults again
     if (!localUpstreamData.checks) {
-      localUpstreamData.checks = { active: { ...getDefaultUpstreamData().checks.active } };
+      localUpstreamData.checks = { active: { ...defaults.checks.active } };
     } else if (!localUpstreamData.checks.active) {
-      localUpstreamData.checks.active = { ...getDefaultUpstreamData().checks.active };
+      localUpstreamData.checks.active = { ...defaults.checks.active };
     }
-    // Ensure nested structures exist
+    // Ensure nested structures exist using defaults as fallback
     if (!localUpstreamData.checks.active.healthy) {
-      localUpstreamData.checks.active.healthy = { ...getDefaultUpstreamData().checks.active.healthy };
+      localUpstreamData.checks.active.healthy = { ...defaults.checks.active.healthy };
     }
     if (!localUpstreamData.checks.active.unhealthy) {
-      localUpstreamData.checks.active.unhealthy = { ...getDefaultUpstreamData().checks.active.unhealthy };
+      localUpstreamData.checks.active.unhealthy = { ...defaults.checks.active.unhealthy };
     }
   }
   // Trigger emission when switch changes
@@ -603,7 +641,10 @@ watch(upstreamType, (newType) => {
     localUpstreamData.discovery_type = undefined;
     localUpstreamData.service_name = undefined;
     // Convert existing API nodes back to UI format if they exist, else default
-    uiNodes.value = parseNodesToUi(localUpstreamData.nodes as Record<string, number> | undefined);
+    const currentUiNodes = parseNodesToUi(localUpstreamData.nodes as Record<string, number> | undefined);
+    if (JSON.stringify(uiNodes.value) !== JSON.stringify(currentUiNodes)) {
+      uiNodes.value = currentUiNodes;
+    }
   } else {
     // discovery
     localUpstreamData.nodes = undefined; // Clear API nodes
@@ -616,24 +657,12 @@ watch(upstreamType, (newType) => {
 
 const addNode = () => {
   uiNodes.value.push({ host: '', port: null, weight: 1 });
-  // No need to call emitUpdate here, watch(uiNodes) will handle it
 };
 
 const removeNode = (index: number) => {
   if (uiNodes.value.length > 1) {
     uiNodes.value.splice(index, 1);
-    // No need to call emitUpdate here, watch(uiNodes) will handle it
   }
-};
-
-// This function is less critical now due to deep watching uiNodes, but can be kept
-// It ensures the API format in localUpstreamData is kept in sync if needed elsewhere,
-// but the primary update path is now uiNodes -> watch -> emitUpdate -> conversion
-const updateNodesFromUi = () => {
-  // This conversion is mainly for consistency if localUpstreamData.nodes is read internally
-  // The emission logic uses uiNodes directly for conversion.
-  localUpstreamData.nodes = convertNodesToApi(uiNodes.value);
-  // emitUpdate(); // watch(uiNodes) handles emission
 };
 
 // --- Expose Methods ---
@@ -641,11 +670,13 @@ defineExpose({
   validate: () => {
     return formRef.value?.validate();
   },
-  // Expose the *final* data structure intended for the API
-  getApiFormattedData: () => {
+  // Expose the *final* data structure intended for the API as a plain object
+  getApiFormattedData: (): Record<string, any> => {
     // Manually trigger the final conversion and cleanup logic used in emitUpdate
-    const dataToEmit: Partial<Upstream> = JSON.parse(JSON.stringify(localUpstreamData));
+    // Clone the data first
+    const dataToEmit: Record<string, any> = JSON.parse(JSON.stringify(localUpstreamData));
 
+    // Apply the same cleanup logic as in emitUpdate
     if (upstreamType.value === 'nodes') {
       delete dataToEmit.discovery_type;
       delete dataToEmit.service_name;
@@ -656,37 +687,29 @@ defineExpose({
       if (!dataToEmit.discovery_type) delete dataToEmit.service_name;
     }
     if (dataToEmit.pass_host !== 'rewrite') delete dataToEmit.upstream_host;
+
     if (!isHealthCheckActive.value) {
       delete dataToEmit.checks;
-    } else if (dataToEmit.checks?.active && !dataToEmit.checks.active.type) {
-      dataToEmit.checks.active.type = 'http';
+    } else if (dataToEmit.checks?.active) {
+      // Ensure type exists if active checks are enabled
+      if (!dataToEmit.checks.active.type) {
+        dataToEmit.checks.active.type = 'http';
+      }
+      // Optional cleanup for empty strings within active checks
+      if (dataToEmit.checks.active.http_path === '') delete dataToEmit.checks.active.http_path;
+      if (dataToEmit.checks.active.host === '') delete dataToEmit.checks.active.host;
     }
+
+    // Remove undefined top-level keys
     Object.keys(dataToEmit).forEach((key) => {
-      if (dataToEmit[key] === undefined) delete dataToEmit[key];
+      if (dataToEmit[key] === undefined) {
+        delete dataToEmit[key];
+      }
     });
-    return dataToEmit;
+    console.log('Getting API Formatted Data:', dataToEmit);
+    return dataToEmit; // Return the cleaned-up plain object
   },
 });
-
-// --- Options --- (Assuming i18n keys are defined)
-const LOAD_BALANCER_OPTIONS = [
-  { label: t('components.upstreamForm.loadBalancer.roundRobin'), value: 'roundrobin' },
-  { label: t('components.upstreamForm.loadBalancer.consistentHash'), value: 'chash' },
-  { label: t('components.upstreamForm.loadBalancer.ewma'), value: 'ewma' },
-  // { label: t('components.upstreamForm.loadBalancer.leastConn'), value: 'least_conn' }, // Verify APISIX support
-];
-const DISCOVERY_TYPE_OPTIONS = [
-  { label: 'DNS', value: 'dns' },
-  { label: 'Consul', value: 'consul' },
-  { label: 'Nacos', value: 'nacos' },
-  { label: 'Eureka', value: 'eureka' },
-];
-const PROTOCOL_OPTIONS = [
-  { label: 'HTTP', value: 'http' },
-  { label: 'HTTPS', value: 'https' },
-  { label: 'gRPC', value: 'grpc' },
-  { label: 'gRPCS', value: 'grpcs' },
-];
 </script>
 
 <style scoped lang="less">

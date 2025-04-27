@@ -4,6 +4,7 @@ export default {
   viewConfirm: '确定',
   operation: '操作',
   operations: {
+    refresh: '刷新',
     export: '导出TODO',
     create: '新建',
     view: '查看',

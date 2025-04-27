@@ -3,6 +3,7 @@
     <t-card class="list-card-container" :bordered="false">
       <t-row justify="space-between">
         <div class="left-operation-container">
+          <t-button @click="opOnClickRefresh"> {{ t('pages.apisixGlobalRule.operations.refresh') }} </t-button>
           <t-button @click="opClickCreate"> {{ t('pages.apisixGlobalRule.operations.create') }} </t-button>
           <t-button theme="danger" :disabled="tabSelectedRowKeys.length <= 0" @click="opOnClickDelete">
             {{ t('pages.apisixGlobalRule.operations.delete') }}
@@ -247,6 +248,14 @@ const tabRowOnClickView = (slotProps: BaseTableCellParams<Row>) => {
 };
 
 // #endregion View
+
+// #region Refresh
+
+const opOnClickRefresh = () => {
+  tabRefresh();
+};
+
+// #endregion Refresh
 
 const settingStore = useSettingStore();
 const headerAffixedTop = computed(

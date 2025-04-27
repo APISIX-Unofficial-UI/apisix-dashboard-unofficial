@@ -3,6 +3,7 @@
     <t-card class="list-card-container" :bordered="false">
       <t-row justify="space-between">
         <div class="left-operation-container">
+          <t-button @click="opOnClickRefresh"> {{ t('pages.apisixSsl.operations.refresh') }} </t-button>
           <t-button @click="opClickCreate"> {{ t('pages.apisixSsl.operations.create') }} </t-button>
           <t-button theme="danger" :disabled="tabSelectedRowKeys.length <= 0" @click="opOnClickDelete">
             {{ t('pages.apisixSsl.operations.delete') }}
@@ -238,6 +239,14 @@ const tabRowOnClickView = (slotProps: BaseTableCellParams<Row>) => {
 };
 
 // #endregion View
+
+// #region Refresh
+
+const opOnClickRefresh = () => {
+  tabRefresh();
+};
+
+// #endregion Refresh
 
 const settingsStore = useSettingStore();
 const headerAffixedTop = computed(

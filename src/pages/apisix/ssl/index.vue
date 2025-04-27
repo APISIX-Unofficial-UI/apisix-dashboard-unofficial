@@ -107,7 +107,7 @@ export default {
 import dayjs from 'dayjs';
 import { SearchIcon } from 'tdesign-icons-vue-next';
 import { BaseTableCellParams, MessagePlugin, TableProps } from 'tdesign-vue-next';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onActivated, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { ApisixAdminRoutesIdDelete200Response } from '@/api/apisix/admin/typescript-axios';
@@ -119,7 +119,7 @@ import { useSettingStore } from '@/store';
 import type { Row, RowPK } from './table';
 import { COLUMN_CONTROLLER, COLUMNS, deleteRow, DISPLAY_COLUMNS, fetchData, ROW_PK } from './table';
 
-onMounted(() => {
+onActivated(() => {
   tabRefresh();
 });
 

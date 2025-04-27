@@ -4,10 +4,10 @@
       <t-row justify="space-between">
         <div class="left-operation-container">
           <t-button @click="opClickCreate"> {{ t('pages.apisixService.create') }} </t-button>
-          <t-button theme="danger" :disabled="tabSelectedRowKeys.length > 0" @click="opOnClickDelete">
+          <t-button theme="danger" :disabled="tabSelectedRowKeys.length <= 0" @click="opOnClickDelete">
             {{ t('pages.apisixService.delete') }}
           </t-button>
-          <t-button variant="base" theme="default" :disabled="tabSelectedRowKeys.length > 0" @click="opClickExport">
+          <t-button variant="base" theme="default" :disabled="tabSelectedRowKeys.length <= 0" @click="opClickExport">
             {{ t('pages.apisixService.export') }}</t-button
           >
           <p v-if="tabSelectedRowKeys.length > 0" class="selected-count">

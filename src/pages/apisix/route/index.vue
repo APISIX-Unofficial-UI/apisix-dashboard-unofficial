@@ -3,12 +3,12 @@
     <t-card class="list-card-container" :bordered="false">
       <t-row justify="space-between">
         <div class="left-operation-container">
-          <t-button @click="opClickCreate"> {{ t('pages.apisixRoute.create') }} </t-button>
+          <t-button @click="opClickCreate"> {{ t('pages.apisixRoute.operations.create') }} </t-button>
           <t-button theme="danger" :disabled="tabSelectedRowKeys.length <= 0" @click="opOnClickDelete">
-            {{ t('pages.apisixRoute.delete') }}
+            {{ t('pages.apisixRoute.operations.delete') }}
           </t-button>
           <t-button variant="base" theme="default" :disabled="tabSelectedRowKeys.length <= 0" @click="opClickExport">
-            {{ t('pages.apisixRoute.export') }}</t-button
+            {{ t('pages.apisixRoute.operations.export') }}</t-button
           >
           <p v-if="tabSelectedRowKeys.length > 0" class="selected-count">
             {{ t('pages.apisixRoute.selectedCount', { num: tabSelectedRowKeys.length }) }}

@@ -3,12 +3,12 @@
     <t-card class="list-card-container" :bordered="false">
       <t-row justify="space-between">
         <div class="left-operation-container">
-          <t-button @click="opClickCreate"> {{ t('pages.apisixGlobalRule.create') }} </t-button>
+          <t-button @click="opClickCreate"> {{ t('pages.apisixGlobalRule.operations.create') }} </t-button>
           <t-button theme="danger" :disabled="tabSelectedRowKeys.length <= 0" @click="opOnClickDelete">
-            {{ t('pages.apisixGlobalRule.delete') }}
+            {{ t('pages.apisixGlobalRule.operations.delete') }}
           </t-button>
           <t-button variant="base" theme="default" :disabled="tabSelectedRowKeys.length <= 0" @click="opClickExport">
-            {{ t('pages.apisixGlobalRule.export') }}</t-button
+            {{ t('pages.apisixGlobalRule.operations.export') }}</t-button
           >
           <p v-if="tabSelectedRowKeys.length > 0" class="selected-count">
             {{ t('pages.apisixGlobalRule.selectedCount', { num: tabSelectedRowKeys.length }) }}

@@ -3,12 +3,12 @@
     <t-card class="list-card-container" :bordered="false">
       <t-row justify="space-between">
         <div class="left-operation-container">
-          <t-button @click="opClickCreate"> {{ t('pages.apisixProto.create') }} </t-button>
+          <t-button @click="opClickCreate"> {{ t('pages.apisixProto.operations.create') }} </t-button>
           <t-button theme="danger" :disabled="tabSelectedRowKeys.length <= 0" @click="opOnClickDelete">
-            {{ t('pages.apisixProto.delete') }}
+            {{ t('pages.apisixProto.operations.delete') }}
           </t-button>
           <t-button variant="base" theme="default" :disabled="tabSelectedRowKeys.length <= 0" @click="opClickExport">
-            {{ t('pages.apisixProto.export') }}</t-button
+            {{ t('pages.apisixProto.operations.export') }}</t-button
           >
           <p v-if="tabSelectedRowKeys.length > 0" class="selected-count">
             {{ t('pages.apisixProto.selectedCount', { num: tabSelectedRowKeys.length }) }}

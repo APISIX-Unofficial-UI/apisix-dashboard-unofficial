@@ -245,17 +245,23 @@
     </t-form-item>
 
     <div v-if="isHealthCheckActive">
-      <!-- Currently only supporting active checks based on example -->
       <t-form-item
         :label="t('components.upstreamForm.healthCheck.active.httpPathLabel')"
         name="checks.active.http_path"
+        required-mark
+        :rules="HEALTH_CHECK_RULES['checks.active.http_path']"
       >
         <t-input
           v-model="localUpstreamData.checks.active.http_path"
           :placeholder="t('components.upstreamForm.healthCheck.active.httpPathPlaceholder')"
         />
       </t-form-item>
-      <t-form-item :label="t('components.upstreamForm.healthCheck.active.hostLabel')" name="checks.active.host">
+      <t-form-item
+        :label="t('components.upstreamForm.healthCheck.active.hostLabel')"
+        name="checks.active.host"
+        required-mark
+        :rules="HEALTH_CHECK_RULES['checks.active.host']"
+      >
         <t-input
           v-model="localUpstreamData.checks.active.host"
           :placeholder="t('components.upstreamForm.healthCheck.active.hostPlaceholder')"
@@ -268,6 +274,8 @@
           <t-form-item
             :label="t('components.upstreamForm.healthCheck.active.healthy.intervalLabel')"
             name="checks.active.healthy.interval"
+            required-mark
+            :rules="HEALTH_CHECK_RULES['checks.active.healthy.interval']"
           >
             <t-input-number
               v-model="localUpstreamData.checks.active.healthy.interval"
@@ -284,6 +292,8 @@
           <t-form-item
             :label="t('components.upstreamForm.healthCheck.active.healthy.successesLabel')"
             name="checks.active.healthy.successes"
+            required-mark
+            :rules="HEALTH_CHECK_RULES['checks.active.healthy.successes']"
           >
             <t-input-number
               v-model="localUpstreamData.checks.active.healthy.successes"
@@ -302,6 +312,8 @@
           <t-form-item
             :label="t('components.upstreamForm.healthCheck.active.unhealthy.intervalLabel')"
             name="checks.active.unhealthy.interval"
+            required-mark
+            :rules="HEALTH_CHECK_RULES['checks.active.unhealthy.interval']"
           >
             <t-input-number
               v-model="localUpstreamData.checks.active.unhealthy.interval"
@@ -318,6 +330,8 @@
           <t-form-item
             :label="t('components.upstreamForm.healthCheck.active.unhealthy.httpFailuresLabel')"
             name="checks.active.unhealthy.http_failures"
+            required-mark
+            :rules="HEALTH_CHECK_RULES['checks.active.unhealthy.http_failures']"
           >
             <t-input-number
               v-model="localUpstreamData.checks.active.unhealthy.http_failures"
@@ -329,38 +343,29 @@
           </t-form-item>
         </t-col>
       </t-row>
-      <!-- Add fields for other check types (tcp, https) or passive checks if needed -->
     </div>
   </t-form>
 </template>
 
 <script setup lang="ts">
-import debounce from 'lodash/debounce';
 import { FormInstanceFunctions, MessagePlugin } from 'tdesign-vue-next';
 import { reactive, ref, watch } from 'vue';
 
-// Removed the problematic import:
-// import { Node, Upstream } from '@/api/apisix/typing';
-import { t } from '@/locales'; // Assuming your i18n setup
+import { t } from '@/locales';
 
-import { DISCOVERY_TYPE_OPTIONS, LOAD_BALANCER_OPTIONS, PROTOCOL_OPTIONS } from './constants';
+import { DISCOVERY_TYPE_OPTIONS, HEALTH_CHECK_RULES, LOAD_BALANCER_OPTIONS, PROTOCOL_OPTIONS } from './constants';
 
-// Define a simple interface for the UI representation of a node
-// This replaces the imported 'Node' type for internal use.
 interface UiNode {
   host: string;
   port: number | null;
   weight: number;
 }
 
-// Define props and emit for v-model
+// Define props for v-model
 // Use Record<string, any> to accept a generic key-value object
 const props = defineProps<{
-  modelValue: Record<string, any> | undefined | null; // Accept plain object
+  modelValue: Record<string, any> | undefined | null;
 }>();
-
-// Emit uses a plain object structure
-const emit = defineEmits(['update:modelValue']);
 
 // --- Internal State ---
 const formRef = ref<FormInstanceFunctions>();
@@ -395,7 +400,7 @@ function parseNodesToUi(apiNodes: Record<string, number> | undefined): UiNode[] 
         parsed.push({ host, port, weight });
       } else {
         console.warn(`[UpstreamForm] Skipping invalid node entry: ${key}:${weight}`);
-        MessagePlugin.warning(t('components.upstreamForm.warnings.invalidNodeFormat', { entry: `${key}:${weight}` }));
+        MessagePlugin.warning(t('components.upstreamForm.warnings.invalidNodeFormat'));
       }
     }
   }
@@ -439,20 +444,18 @@ function getDefaultUpstreamData(): Record<string, any> {
     // --- Health Checks (Structure needed for v-model) ---
     checks: {
       active: {
-        type: 'http', // Default type if enabling active checks
+        type: 'http',
         http_path: undefined,
-        host: undefined, // SNI Host
+        host: undefined,
         healthy: {
           interval: undefined,
           successes: undefined,
         },
         unhealthy: {
           interval: undefined,
-          http_failures: undefined, // Use http_failures for http checks
+          http_failures: undefined,
         },
-        // Add other potential fields like `port`, `https_verify_certificate`, `req_headers` if needed
       },
-      // passive: { ... } // Add passive structure if needed later
     },
   };
 }
@@ -468,11 +471,11 @@ watch(
     const incoming: Record<string, any> = newVal || {};
 
     // Determine upstream type (nodes vs discovery)
-    // if (incoming.discovery_type) {
-    //   upstreamType.value = 'discovery';
-    // } else {
-    //   upstreamType.value = 'nodes';
-    // }
+    if (incoming.discovery_type) {
+      upstreamType.value = 'discovery';
+    } else {
+      upstreamType.value = 'nodes';
+    }
 
     // Merge top-level fields
     Object.assign(localUpstreamData, {
@@ -492,7 +495,7 @@ watch(
       localUpstreamData.nodes = incoming.nodes; // Keep API format in local data for now
     } else {
       uiNodes.value = [{ host: '', port: null, weight: 1 }]; // Reset UI nodes if discovery
-      // localUpstreamData.nodes = undefined; // Clear API nodes if discovery
+      localUpstreamData.nodes = undefined; // Clear API nodes
     }
 
     // Set health check switch state
@@ -538,121 +541,6 @@ function deepMergeChecks(defaults: any, incoming: any): any {
   return merged;
 }
 
-// Debounced function to emit updates when local data changes
-const emitUpdate = debounce(() => {
-  // Clone the local data to create the object to emit
-  const dataToEmit: Record<string, any> = JSON.parse(JSON.stringify(localUpstreamData)); // Deep clone
-
-  // Clean up based on upstreamType
-  if (upstreamType.value === 'nodes') {
-    delete dataToEmit.discovery_type;
-    delete dataToEmit.service_name;
-    // Convert UI nodes back to API format just before emitting
-    dataToEmit.nodes = convertNodesToApi(uiNodes.value);
-    if (!dataToEmit.nodes) delete dataToEmit.nodes; // Remove nodes if empty/invalid
-  } else {
-    // discovery
-    delete dataToEmit.nodes;
-    if (!dataToEmit.discovery_type) delete dataToEmit.service_name;
-  }
-
-  // Clean up host header fields
-  if (dataToEmit.pass_host !== 'rewrite') {
-    delete dataToEmit.upstream_host;
-  }
-
-  // Clean up health checks based on the switch
-  if (!isHealthCheckActive.value) {
-    delete dataToEmit.checks; // Remove entire checks object if switch is off
-  } else {
-    // Optional: Further cleanup within active checks if needed (e.g., remove empty strings)
-    if (dataToEmit.checks?.active?.http_path === '') delete dataToEmit.checks.active.http_path;
-    if (dataToEmit.checks?.active?.host === '') delete dataToEmit.checks.active.host;
-    // ... potentially more cleanup ...
-
-    // Ensure the 'type' field exists if active checks are enabled and it's missing
-    if (dataToEmit.checks?.active && !dataToEmit.checks.active.type) {
-      dataToEmit.checks.active.type = 'http'; // Set default type
-    }
-  }
-
-  // Remove undefined top-level keys (optional, depends on API expectations)
-  Object.keys(dataToEmit).forEach((key) => {
-    // Check specifically for undefined, allow null or other falsy values if intended
-    if (dataToEmit[key] === undefined) {
-      delete dataToEmit[key];
-    }
-  });
-
-  console.log('Emitting:', dataToEmit);
-  // Emit the cleaned-up plain object
-  emit('update:modelValue', dataToEmit);
-}, 300); // Debounce emission by 300ms
-
-// Watch deep changes in localUpstreamData (excluding nodes, handled separately)
-watch(
-  () => {
-    const { nodes, ...rest } = localUpstreamData;
-    return rest;
-  },
-  emitUpdate,
-  { deep: true },
-);
-
-// Watch for changes in the UI nodes array and update API format
-watch(
-  uiNodes,
-  (newNodes) => {
-    // Update nodes in localUpstreamData without triggering the localUpstreamData watcher
-    const apiNodes = convertNodesToApi(newNodes);
-    if (JSON.stringify(localUpstreamData.nodes) !== JSON.stringify(apiNodes)) {
-      localUpstreamData.nodes = apiNodes;
-      emitUpdate();
-    }
-  },
-  { deep: true },
-);
-
-// Watch the health check switch
-watch(isHealthCheckActive, (isActive) => {
-  if (isActive) {
-    // If activating, ensure the checks.active structure exists
-    const defaults = getDefaultUpstreamData(); // Get defaults again
-    if (!localUpstreamData.checks) {
-      localUpstreamData.checks = { active: { ...defaults.checks.active } };
-    } else if (!localUpstreamData.checks.active) {
-      localUpstreamData.checks.active = { ...defaults.checks.active };
-    }
-    // Ensure nested structures exist using defaults as fallback
-    if (!localUpstreamData.checks.active.healthy) {
-      localUpstreamData.checks.active.healthy = { ...defaults.checks.active.healthy };
-    }
-    if (!localUpstreamData.checks.active.unhealthy) {
-      localUpstreamData.checks.active.unhealthy = { ...defaults.checks.active.unhealthy };
-    }
-  }
-  // Trigger emission when switch changes
-  emitUpdate();
-});
-
-// Watch the UI upstream type selector
-watch(upstreamType, (newType) => {
-  if (newType === 'nodes') {
-    localUpstreamData.discovery_type = undefined;
-    localUpstreamData.service_name = undefined;
-    // Convert existing API nodes back to UI format if they exist, else default
-    const currentUiNodes = parseNodesToUi(localUpstreamData.nodes as Record<string, number> | undefined);
-    if (JSON.stringify(uiNodes.value) !== JSON.stringify(currentUiNodes)) {
-      uiNodes.value = currentUiNodes;
-    }
-  } else {
-    // discovery
-    localUpstreamData.nodes = undefined; // Clear API nodes
-    uiNodes.value = [{ host: '', port: null, weight: 1 }]; // Reset UI nodes
-  }
-  emitUpdate(); // Trigger update when type changes
-});
-
 // --- UI Interaction Methods ---
 
 const addNode = () => {
@@ -668,46 +556,55 @@ const removeNode = (index: number) => {
 // --- Expose Methods ---
 defineExpose({
   validate: () => {
+    if (upstreamType.value === 'nodes') {
+      // Validate each node's host, port, and weight
+      for (const node of uiNodes.value) {
+        if (!node.host || !node.port || node.weight === null || node.weight < 0) {
+          MessagePlugin.warning(t('components.upstreamForm.warnings.invalidNodeFormat'));
+          return false;
+        }
+      }
+    }
     return formRef.value?.validate();
   },
   // Expose the *final* data structure intended for the API as a plain object
   getApiFormattedData: (): Record<string, any> => {
     // Manually trigger the final conversion and cleanup logic used in emitUpdate
     // Clone the data first
-    const dataToEmit: Record<string, any> = JSON.parse(JSON.stringify(localUpstreamData));
+    const result: Record<string, any> = JSON.parse(JSON.stringify(localUpstreamData));
 
     // Apply the same cleanup logic as in emitUpdate
     if (upstreamType.value === 'nodes') {
-      delete dataToEmit.discovery_type;
-      delete dataToEmit.service_name;
-      dataToEmit.nodes = convertNodesToApi(uiNodes.value);
-      if (!dataToEmit.nodes) delete dataToEmit.nodes;
+      delete result.discovery_type;
+      delete result.service_name;
+      result.nodes = convertNodesToApi(uiNodes.value);
+      if (!result.nodes) delete result.nodes;
     } else {
-      delete dataToEmit.nodes;
-      if (!dataToEmit.discovery_type) delete dataToEmit.service_name;
+      delete result.nodes;
+      if (!result.discovery_type) delete result.service_name;
     }
-    if (dataToEmit.pass_host !== 'rewrite') delete dataToEmit.upstream_host;
+    if (result.pass_host !== 'rewrite') delete result.upstream_host;
 
     if (!isHealthCheckActive.value) {
-      delete dataToEmit.checks;
-    } else if (dataToEmit.checks?.active) {
+      delete result.checks;
+    } else if (result.checks?.active) {
       // Ensure type exists if active checks are enabled
-      if (!dataToEmit.checks.active.type) {
-        dataToEmit.checks.active.type = 'http';
+      if (!result.checks.active.type) {
+        result.checks.active.type = 'http';
       }
       // Optional cleanup for empty strings within active checks
-      if (dataToEmit.checks.active.http_path === '') delete dataToEmit.checks.active.http_path;
-      if (dataToEmit.checks.active.host === '') delete dataToEmit.checks.active.host;
+      if (result.checks.active.http_path === '') delete result.checks.active.http_path;
+      if (result.checks.active.host === '') delete result.checks.active.host;
     }
 
     // Remove undefined top-level keys
-    Object.keys(dataToEmit).forEach((key) => {
-      if (dataToEmit[key] === undefined) {
-        delete dataToEmit[key];
+    Object.keys(result).forEach((key) => {
+      if (result[key] === undefined) {
+        delete result[key];
       }
     });
-    console.log('Getting API Formatted Data:', dataToEmit);
-    return dataToEmit; // Return the cleaned-up plain object
+    console.log('Getting API Formatted Data:', result);
+    return result; // Return the cleaned-up plain object
   },
 });
 </script>

@@ -101,27 +101,33 @@ export default {
       enableLabel: '启用主动健康检查',
       httpPathLabel: 'HTTP检查路径',
       httpPathPlaceholder: '请输入HTTP检查路径',
+      httpPathRequired: '请填写HTTP检查路径',
       hostLabel: '主机名',
       hostPlaceholder: '请输入主机名',
+      hostRequired: '请填写主机名',
       healthy: {
         title: '健康判定条件',
         intervalLabel: '检查间隔',
         intervalPlaceholder: '请输入健康检查间隔时间',
+        intervalRequired: '请填写健康检查间隔时间',
         successesLabel: '成功次数',
         successesPlaceholder: '请输入判定为健康所需的成功次数',
+        successesRequired: '请填写健康判定所需的成功次数',
       },
       unhealthy: {
         title: '不健康判定条件',
         intervalLabel: '检查间隔',
         intervalPlaceholder: '请输入不健康检查间隔时间',
+        intervalRequired: '请填写不健康检查间隔时间',
         httpFailuresLabel: 'HTTP失败次数',
         httpFailuresPlaceholder: '请输入判定为不健康所需的HTTP失败次数',
+        httpFailuresRequired: '请填写不健康判定所需的HTTP失败次数',
       },
     },
   },
 
   // 警告信息
   warnings: {
-    invalidNodeFormat: '节点格式无效：{entry}',
+    invalidNodeFormat: '节点格式无效',
   },
 };

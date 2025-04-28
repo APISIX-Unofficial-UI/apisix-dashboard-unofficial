@@ -79,9 +79,17 @@ const loadInitialData = (type: 'nodes' | 'discovery' | 'empty') => {
 
 const validateForm = async () => {
   if (upstreamFormRef.value) {
+    const result = upstreamFormRef.value.validate();
+    // result 可能是 false（节点验证失败）或 Promise（表单验证）
+    if (result === false) {
+      validationResult.value = false;
+      MessagePlugin.error('校验失败');
+      console.error('测试页面: 校验失败 - 节点验证未通过');
+      return;
+    }
+
     try {
-      // 假设 UpstreamForm 暴露了 validate 方法
-      await upstreamFormRef.value.validate();
+      await result;
       validationResult.value = true;
       MessagePlugin.success('校验通过');
       console.log('测试页面: 校验通过');

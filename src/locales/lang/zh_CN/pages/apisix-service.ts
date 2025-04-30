@@ -1,10 +1,10 @@
 export default {
-  export: '导出TODO',
-  create: '新建',
   selectedCount: '已选 {num} 项',
   placeholder: '请输入内容搜索TODO',
   operation: '操作',
   operations: {
+    export: '导出TODO',
+    create: '新建',
     view: '查看',
     edit: '编辑',
     delete: '删除',

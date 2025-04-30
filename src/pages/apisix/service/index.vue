@@ -3,16 +3,19 @@
     <t-card class="list-card-container" :bordered="false">
       <t-row justify="space-between">
         <div class="left-operation-container">
-          <t-button @click="handleCreate"> {{ t('pages.apisixService.create') }} </t-button>
-          <t-button variant="base" theme="default" :disabled="!selectedRowKeys.length">
-            {{ t('pages.apisixService.export') }}</t-button
+          <t-button @click="opClickCreate"> {{ t('pages.apisixService.operations.create') }} </t-button>
+          <t-button theme="danger" :disabled="tabSelectedRowKeys.length <= 0" @click="opOnClickDelete">
+            {{ t('pages.apisixService.operations.delete') }}
+          </t-button>
+          <t-button variant="base" theme="default" :disabled="tabSelectedRowKeys.length <= 0" @click="opClickExport">
+            {{ t('pages.apisixService.operations.export') }}</t-button
           >
-          <p v-if="!!selectedRowKeys.length" class="selected-count">
-            {{ t('pages.apisixService.selectedCount', { num: selectedRowKeys.length }) }}
+          <p v-if="tabSelectedRowKeys.length > 0" class="selected-count">
+            {{ t('pages.apisixService.selectedCount', { num: tabSelectedRowKeys.length }) }}
           </p>
         </div>
         <div class="search-input">
-          <t-input v-model="searchValue" :placeholder="t('pages.apisixService.placeholder')" clearable>
+          <t-input v-model="tabSearchValue" :placeholder="t('pages.apisixService.placeholder')" clearable>
             <template #suffix-icon>
               <search-icon size="16px" />
             </template>
@@ -20,24 +23,22 @@
         </div>
       </t-row>
       <t-table
-        v-model:displayColumns="displayColumns"
-        :data="data"
+        v-model:display-columns="DISPLAY_COLUMNS"
+        :data="tabData"
         :columns="COLUMNS"
-        :column-controller="columnControllerConfig"
-        :row-key="rowKey"
+        :column-controller="COLUMN_CONTROLLER"
+        :row-key="ROW_PK"
         vertical-align="top"
         :hover="true"
-        :pagination="pagination"
-        :selected-row-keys="selectedRowKeys"
-        :loading="dataLoading"
+        :pagination="tabPagination"
+        :selected-row-keys="tabSelectedRowKeys"
+        :loading="tabDataLoading"
         :header-affixed-top="headerAffixedTop"
         table-layout="auto"
-        @page-change="rehandlePageChange"
-        @change="rehandleChange"
-        @select-change="(value: string[]) => rehandleSelectChange(value)"
+        @select-change="tabSelectChange"
       >
         <!-- eslint-disable-next-line vue/valid-v-slot -->
-        <template #value.labels="{ row }">
+        <template #value.labels="{ row }: BaseTableCellParams<Row>">
           <t-space size="small">
             <t-tag v-for="(value, key) in row.value.labels" :key="key" variant="light-outline">
               {{ key }}:{{ value }}
@@ -46,7 +47,7 @@
         </template>
 
         <!-- eslint-disable-next-line vue/valid-v-slot -->
-        <template #value.plugins="{ row }">
+        <template #value.plugins="{ row }: BaseTableCellParams<Row>">
           <t-space size="small">
             <t-tag v-for="(value, key) in row.value.plugins" :key="key" variant="light-outline">
               {{ key }}
@@ -55,17 +56,17 @@
         </template>
 
         <!-- eslint-disable-next-line vue/valid-v-slot -->
-        <template #value.enable_websocket="{ row }">
-          <t-tag v-if="row.value.enable_websocket === 0" theme="danger" variant="light-outline">
-            {{ t('pages.apisixRoute.value.enable_websocketEnum.0') }}
+        <template #value.enable_websocket="{ row }: BaseTableCellParams<Row>">
+          <t-tag v-if="!row.value.enable_websocket" theme="danger" variant="light-outline">
+            {{ t('pages.apisixService.value.enable_websocketEnum.0') }}
           </t-tag>
-          <t-tag v-if="row.value.enable_websocket === 1" theme="success" variant="light-outline">
-            {{ t('pages.apisixRoute.value.enable_websocketEnum.1') }}
+          <t-tag v-if="row.value.enable_websocket" theme="success" variant="light-outline">
+            {{ t('pages.apisixService.value.enable_websocketEnum.1') }}
           </t-tag>
         </template>
 
         <!-- eslint-disable-next-line vue/valid-v-slot -->
-        <template #value.hosts="{ row }">
+        <template #value.hosts="{ row }: BaseTableCellParams<Row>">
           <t-space size="small">
             <t-tag v-for="(value, key) in row.value.hosts" :key="key" variant="light-outline">
               {{ value }}
@@ -74,7 +75,7 @@
         </template>
 
         <!-- eslint-disable-next-line vue/valid-v-slot -->
-        <template #value.create_time="{ row }">
+        <template #value.create_time="{ row }: BaseTableCellParams<Row>">
           {{ dayjs.unix(row.value.create_time).format('L LT') }}
         </template>
 
@@ -83,15 +84,15 @@
           {{ dayjs.unix(row.value.update_time).format('L LT') }}
         </template>
 
-        <template #op="slotProps: BaseTableCellParams<Item>">
+        <template #op="slotProps: BaseTableCellParams<Row>">
           <t-space>
-            <t-link theme="primary" @click="handleClickView(slotProps)">
+            <t-link theme="primary" @click="tabRowOnClickView(slotProps)">
               {{ t('pages.apisixService.operations.view') }}</t-link
             >
-            <t-link theme="primary" @click="handleClickEdit(slotProps)">
+            <t-link theme="primary" @click="tabRowOnClickEdit(slotProps)">
               {{ t('pages.apisixService.operations.edit') }}</t-link
             >
-            <t-link theme="danger" @click="handleClickDelete(slotProps)">
+            <t-link theme="danger" @click="tabRowOnClickDelete(slotProps)">
               {{ t('pages.apisixService.operations.delete') }}</t-link
             >
           </t-space>
@@ -100,30 +101,30 @@
     </t-card>
 
     <t-dialog
-      v-model:visible="confirmVisible"
+      v-model:visible="delModalVisible"
       :header="t('pages.apisixService.deleteConfirm.header')"
-      :on-cancel="onCancel"
-      @confirm="onConfirmDelete"
+      :on-cancel="delModalOnCancel"
+      @confirm="delModalOnConfirm"
     >
-      <p v-if="deleteIdx.length === 1">
+      <p v-if="toDelRowKeys.length === 1">
         {{
           t('pages.apisixService.deleteConfirm.deleteOne', {
-            name: data[deleteIdx[0]]?.value?.id,
+            name: tabData.find((e) => e.key === toDelRowKeys[0])?.value?.id,
           })
         }}
       </p>
-      <p v-if="deleteIdx.length > 1">
+      <p v-if="toDelRowKeys.length > 1">
         {{
           t('pages.apisixService.deleteConfirm.deleteMulti', {
-            name: data[deleteIdx[0]]?.value?.id,
-            num: deleteIdx.length,
+            name: tabData.find((e) => e.key === toDelRowKeys[0])?.value?.id,
+            num: toDelRowKeys.length,
           })
         }}
       </p>
     </t-dialog>
 
-    <t-drawer v-model:visible="drawerVisible" :header="drawerHeader" :on-confirm="onDrawerClickConfirm" size="medium">
-      <code-editor v-model:value="drawerBody" language="json" />
+    <t-drawer v-model:visible="viewDrawerVisible" :header="viewDrawerHeader" size="medium">
+      <code-editor v-model:value="viewDrawerContent" language="json" />
     </t-drawer>
   </div>
 </template>
@@ -135,279 +136,149 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { AxiosPromise } from 'axios';
 import dayjs from 'dayjs';
 import { SearchIcon } from 'tdesign-icons-vue-next';
-import { BaseTableCellParams, MessagePlugin, PrimaryTableCol, TableProps, TableRowData } from 'tdesign-vue-next';
-import { computed, onMounted, ref } from 'vue';
+import { BaseTableCellParams, MessagePlugin, TableProps } from 'tdesign-vue-next';
+import { computed, onActivated, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
-import { ServiceApi } from '@/api/apisix/admin';
-import {
-  ApisixAdminRoutesIdDelete200Response,
-  ApisixAdminServicesGet200ResponseListInner as Item,
-} from '@/api/apisix/admin/typescript-axios';
+import { ApisixAdminRoutesIdDelete200Response } from '@/api/apisix/admin/typescript-axios';
 import CodeEditor from '@/components/code-editor/index.vue';
 import { prefix } from '@/config/global';
 import { t } from '@/locales';
 import { useSettingStore } from '@/store';
 
-const store = useSettingStore();
+import type { Row, RowPK } from './table';
+import { COLUMN_CONTROLLER, COLUMNS, deleteRow, DISPLAY_COLUMNS, fetchData, ROW_PK } from './table';
 
-const COLUMNS: PrimaryTableCol<TableRowData>[] = [
-  { colKey: 'row-select', type: 'multiple', width: 64, fixed: 'left' },
-  {
-    title: t('pages.apisixService.root.key'),
-    colKey: 'key',
-    fixed: 'left',
-  },
-  {
-    title: t('pages.apisixService.root.createdIndex'),
-    colKey: 'createdIndex',
-    fixed: 'left',
-  },
-  {
-    title: t('pages.apisixService.root.modifiedIndex'),
-    colKey: 'modifiedIndex',
-    fixed: 'left',
-  },
-  {
-    title: t('pages.apisixService.value.id'),
-    colKey: 'value.id',
-    fixed: 'left',
-  },
-  {
-    title: t('pages.apisixService.value.name'),
-    colKey: 'value.name',
-  },
-  {
-    title: t('pages.apisixService.value.desc'),
-    colKey: 'value.desc',
-  },
-  {
-    title: t('pages.apisixService.value.labels'),
-    colKey: 'value.labels',
-  },
-  {
-    title: t('pages.apisixService.value.upstream_id'),
-    colKey: 'value.upstream_id',
-  },
-  {
-    title: t('pages.apisixService.value.upstream'),
-    colKey: 'value.upstream',
-  },
-  {
-    title: t('pages.apisixService.value.plugins'),
-    colKey: 'value.plugins',
-  },
-  {
-    title: t('pages.apisixService.value.enable_websocket'),
-    colKey: 'value.enable_websocket',
-  },
-  {
-    title: t('pages.apisixService.value.script'),
-    colKey: 'value.script',
-  },
-  {
-    title: t('pages.apisixService.value.hosts'),
-    colKey: 'value.hosts',
-  },
-  {
-    title: t('pages.apisixService.value.create_time'),
-    colKey: 'value.create_time',
-    width: 240,
-  },
-  {
-    title: t('pages.apisixService.value.update_time'),
-    colKey: 'value.update_time',
-    width: 240,
-  },
-  {
-    title: t('pages.apisixService.operation'),
-    align: 'left',
-    fixed: 'right',
-    colKey: 'op',
-    width: 160,
-  },
-];
-const staticColumn: string[] = ['row-select', 'op'];
-const displayColumns = ref<TableProps['displayColumns']>(
-  staticColumn.concat([
-    'value.id',
-    'value.name',
-    'value.desc',
-    'value.labels',
-    'value.plugins',
-    'value.enable_websocket',
-    'value.hosts',
-  ]),
-);
-const columnControllerConfig = computed<TableProps['columnController']>(() => ({
-  // 列配置按钮位置
-  placement: 'top-right',
-  // 用于设置允许用户对哪些列进行显示或隐藏的控制，默认为全部字段
-  fields: undefined,
-  // 弹框组件属性透传
-  dialogProps: {
-    preventScrollThrough: true,
-  },
-  // 列配置按钮组件属性透传
-  buttonProps: undefined,
-  // 数据字段分组显示
-  groupColumns: [
-    {
-      label: 'root',
-      value: 'root',
-      columns: ['key', 'createdIndex', 'modifiedIndex'],
-    },
-    {
-      label: 'value',
-      value: 'value',
-      columns: [
-        'value.id',
-        'value.name',
-        'value.desc',
-        'value.labels',
-        'value.upstream_id',
-        'value.upstream',
-        'value.plugins',
-        'value.enable_websocket',
-        'value.script',
-        'value.hosts',
-        'value.create_time',
-        'value.update_time',
-      ],
-    },
-  ],
-}));
+onActivated(() => {
+  tabRefresh();
+});
 
-const data = ref<Item[]>([]);
-const pagination = ref({
+const router = useRouter();
+
+// #region Table
+
+const tabPagination = ref({
   defaultPageSize: 20,
   total: 100,
   defaultCurrent: 1,
 });
+const tabSearchValue = ref('');
+const tabData = ref<Row[]>([]);
+const tabDataLoading = ref(false);
+const tabSelectedRowKeys = ref<RowPK[]>([]);
 
-const searchValue = ref('');
+const tabSelectChange: TableProps['onSelectChange'] = (selectedRowKey, options) => {
+  tabSelectedRowKeys.value = selectedRowKey.slice() as RowPK[];
+};
 
-const dataLoading = ref(false);
-const fetchData = async () => {
-  dataLoading.value = true;
+const tabRefresh = async () => {
+  tabDataLoading.value = true;
   try {
-    const res = await ServiceApi.apisixAdminServicesGet({
-      params: {
-        page: pagination.value.defaultCurrent,
-        page_size: pagination.value.defaultPageSize,
-      },
-    });
-    let { list } = res.data;
-    // fix: when apisix returns list as {}
-    if (!(list instanceof Array)) {
-      list = [];
-    }
-
-    data.value = list;
-    pagination.value = {
-      ...pagination.value,
-      total: list.length,
+    const resData = await fetchData(undefined, tabPagination.value);
+    tabData.value = resData.list;
+    tabPagination.value = {
+      ...tabPagination.value,
+      total: resData.total,
     };
   } catch (e) {
     console.error(e);
   }
-  dataLoading.value = false;
+  tabDataLoading.value = false;
 };
 
-const deleteIdx = ref<number[]>([]);
+// #endregion Table
 
-onMounted(() => {
-  fetchData();
-});
+// #region Delete
 
-const confirmVisible = ref(false);
+const toDelRowKeys = ref<RowPK[]>([]);
+const delModalVisible = ref(false);
 
-const selectedRowKeys = ref<string[]>([]);
-
-const router = useRouter();
-
-const resetIdx = () => {
-  deleteIdx.value = [];
+const delReset = () => {
+  toDelRowKeys.value = [];
 };
 
-const onConfirmDelete = async () => {
-  // 真实业务请发起请求
-  const ps: AxiosPromise<ApisixAdminRoutesIdDelete200Response>[] = [];
-  deleteIdx.value.forEach((rowIndex) => {
-    const { id } = data.value[rowIndex].value;
-    const p = ServiceApi.apisixAdminServicesIdDelete({
-      id: id.toString(), // fix: apisix openapi
-      force: 'false',
-    });
+const delModalOnCancel = () => {
+  delReset();
+};
+
+const delModalOnConfirm = async () => {
+  const ps: Promise<ApisixAdminRoutesIdDelete200Response>[] = [];
+  toDelRowKeys.value.forEach((rowKey) => {
+    const row = tabData.value.find((e) => e.key === rowKey);
+    const p = deleteRow(row);
     ps.push(p);
   });
-  const resArr = await Promise.all(ps);
+  const resDataArr = await Promise.all(ps); // TODO: 报告成功和失败情况
 
-  const successResArr = resArr.filter((res) => {
-    return res.status === 200 && res.data.deleted;
-  });
+  const successResDataArr = resDataArr.filter((d) => d.deleted);
 
-  resetIdx();
-  confirmVisible.value = false;
-  MessagePlugin.success(t('pages.apisixService.deleteMessage.success', { num: successResArr.length }));
+  delReset();
+  delModalVisible.value = false;
+  MessagePlugin.success(t('pages.apisixService.deleteMessage.success', { num: successResDataArr.length }));
 
-  await fetchData();
+  await tabRefresh();
 };
 
-const onCancel = () => {
-  resetIdx();
+const opOnClickDelete = () => {
+  toDelRowKeys.value = tabSelectedRowKeys.value.slice();
+  delModalVisible.value = true;
 };
 
-const rowKey = 'key';
+const tabRowOnClickDelete = (slotProps: BaseTableCellParams<Row>) => {
+  toDelRowKeys.value = [slotProps.row.key];
+  delModalVisible.value = true;
+};
 
-const rehandleSelectChange = (val: string[]) => {
-  selectedRowKeys.value = val;
-};
-const rehandlePageChange = (curr: unknown, pageInfo: unknown) => {
-  console.log('分页变化', curr, pageInfo);
-};
-const rehandleChange = (changeParams: unknown, triggerAndData: unknown) => {
-  console.log('统一Change', changeParams, triggerAndData);
-};
-const handleClickView = (slotProps: BaseTableCellParams<Item>) => {
-  drawerHeader.value = slotProps.row.value.id.toString(); // fix: apisix openapi
-  drawerBody.value = JSON.stringify(slotProps.row.value, null, 2);
-  drawerVisible.value = true;
-};
-const handleClickEdit = (slotProps: BaseTableCellParams<Item>) => {
-  router.push(`/apisix/service/edit?id=${slotProps.row.value.id}`);
-};
-const handleCreate = () => {
+// #endregion Delete
+
+// #region Create
+
+const opClickCreate = () => {
   router.push('/apisix/service/edit');
 };
-const handleClickDelete = (slotProps: BaseTableCellParams<Item>) => {
-  deleteIdx.value = [slotProps.rowIndex];
-  confirmVisible.value = true;
+
+// #endregion Create
+
+// #region Edit
+
+const tabRowOnClickEdit = (slotProps: BaseTableCellParams<Row>) => {
+  router.push(`/apisix/service/edit?id=${slotProps.row.value.id}`);
 };
 
+// #endregion Edit
+
+// #region Export
+
+const opClickExport = () => {
+  // TODO
+};
+
+// #endregion Export
+
+// #region View
+
+const viewDrawerVisible = ref(false);
+const viewDrawerHeader = ref('');
+const viewDrawerContent = ref('');
+
+const tabRowOnClickView = (slotProps: BaseTableCellParams<Row>) => {
+  viewDrawerHeader.value = slotProps.row.value.id as string;
+  viewDrawerContent.value = JSON.stringify(slotProps.row.value, null, 2);
+  viewDrawerVisible.value = true;
+};
+
+// #endregion View
+
+const settingsStore = useSettingStore();
 const headerAffixedTop = computed(
   () =>
     ({
-      offsetTop: store.isUseTabsRouter ? 48 : 0,
+      offsetTop: settingsStore.isUseTabsRouter ? 48 : 0,
       container: `.${prefix}-layout`,
     }) as any,
 );
-
-const drawerVisible = ref(false);
-const drawerHeader = ref('');
-const drawerBody = ref('');
-
-const onDrawerClickConfirm = () => {
-  MessagePlugin.info('数据保存中...', 1000);
-  const timer = setTimeout(() => {
-    clearTimeout(timer);
-    drawerVisible.value = false;
-    MessagePlugin.info('数据保存成功!');
-  }, 1000);
-};
 </script>
 
 <style lang="less" scoped>

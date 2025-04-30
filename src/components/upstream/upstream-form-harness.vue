@@ -10,6 +10,7 @@
       <t-space direction="vertical" style="width: 100%">
         <t-space>
           <t-button @click="loadInitialData('empty')">加载空数据</t-button>
+          <t-button @click="loadInitialData('nodes')">加载node数据</t-button>
           <t-button theme="primary" @click="validateForm">校验表单</t-button>
           <t-button theme="success" @click="showApiData">显示 API 格式数据</t-button>
         </t-space>
@@ -18,11 +19,6 @@
         </t-alert>
       </t-space>
     </t-card>
-
-    <t-card title="当前表单数据 (v-model 绑定)" style="margin-top: 20px">
-      <pre>{{ JSON.stringify(formData, null, 2) }}</pre>
-    </t-card>
-
     <t-card title="API 格式化数据 (getApiFormattedData)" style="margin-top: 20px">
       <pre>{{ JSON.stringify(apiFormattedData, null, 2) }}</pre>
     </t-card>
@@ -48,14 +44,49 @@ const loadInitialData = (type: 'nodes' | 'discovery' | 'empty') => {
   apiFormattedData.value = null;
   if (type === 'nodes') {
     formData.value = {
-      /* ... 节点示例数据 ... */
+      type: 'chash',
+      pass_host: 'pass',
+      retries: 10,
+      retry_timeout: 5,
+      scheme: 'https',
+      timeout: {
+        connect: 151,
+        send: 151,
+        read: 152,
+      },
+      keepalive_pool: {
+        size: 3200,
+        idle_timeout: 601,
+        requests: 500,
+      },
+      checks: {
+        active: {
+          type: 'http',
+          http_path: '/v1/health_check',
+          host: '192.168.0.1',
+          healthy: {
+            interval: 10,
+            successes: 5,
+            http_statuses: [200, 302],
+          },
+          unhealthy: {
+            interval: 1,
+            http_failures: 3,
+            http_statuses: [429, 404, 500, 501, 502, 503, 504, 505],
+          },
+        },
+      },
+      nodes: {
+        '192.168.0.1:1233': 2,
+        '192.168.0.2:2333': 4,
+      },
     };
   } else if (type === 'discovery') {
     formData.value = {
       /* ... 服务发现示例数据 ... */
     };
   } else {
-    formData.value = null;
+    upstreamFormRef.value?.resetForm();
   }
   console.log('测试页面: 加载数据', formData.value);
 };
@@ -63,32 +94,21 @@ const loadInitialData = (type: 'nodes' | 'discovery' | 'empty') => {
 const validateForm = async () => {
   if (upstreamFormRef.value) {
     const result = upstreamFormRef.value.validate();
-    // result 可能是 false（节点验证失败）或 Promise（表单验证）
     if (result === false) {
       validationResult.value = false;
       MessagePlugin.error('校验失败');
       console.error('测试页面: 校验失败 - 节点验证未通过');
       return;
     }
-
-    try {
-      await result;
-      validationResult.value = true;
-      MessagePlugin.success('校验通过');
-      console.log('测试页面: 校验通过');
-    } catch (error) {
-      validationResult.value = false;
-      MessagePlugin.error('校验失败');
-      console.error('测试页面: 校验失败', error);
-    }
+    validationResult.value = true;
+    MessagePlugin.success('校验通过');
+    console.log('测试页面: 校验通过');
   }
 };
 
 const showApiData = () => {
   if (upstreamFormRef.value) {
-    // 假设 UpstreamForm 暴露了 getApiFormattedData 方法
     apiFormattedData.value = upstreamFormRef.value.getApiFormattedData();
-    console.log('测试页面: 获取 API 格式化数据', apiFormattedData.value);
     MessagePlugin.info('API 数据已打印到控制台并在下方显示。');
   }
 };

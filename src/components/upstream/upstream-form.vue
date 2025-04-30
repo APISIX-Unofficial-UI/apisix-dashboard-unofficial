@@ -246,26 +246,86 @@
 
     <div v-if="isHealthCheckActive">
       <t-form-item
+        :label="t('components.upstreamForm.healthCheck.active.healthCheckType')"
+        name="checks.active.type"
+        required-mark
+      >
+        <t-select v-model="localUpstreamData.checks.active.type">
+          <t-option
+            v-for="item in ACTIVE_HEALTH_CHECK_TYPES"
+            :key="item.value"
+            :value="item.value"
+            :label="item.label"
+          />
+        </t-select>
+      </t-form-item>
+      <t-form-item
         :label="t('components.upstreamForm.healthCheck.active.httpPathLabel')"
         name="checks.active.http_path"
         required-mark
-        :rules="HEALTH_CHECK_RULES['checks.active.http_path']"
       >
         <t-input
           v-model="localUpstreamData.checks.active.http_path"
           :placeholder="t('components.upstreamForm.healthCheck.active.httpPathPlaceholder')"
         />
       </t-form-item>
-      <t-form-item
-        :label="t('components.upstreamForm.healthCheck.active.hostLabel')"
-        name="checks.active.host"
-        required-mark
-        :rules="HEALTH_CHECK_RULES['checks.active.host']"
-      >
+      <t-form-item :label="t('components.upstreamForm.healthCheck.active.hostLabel')" name="checks.active.host">
         <t-input
           v-model="localUpstreamData.checks.active.host"
           :placeholder="t('components.upstreamForm.healthCheck.active.hostPlaceholder')"
         />
+      </t-form-item>
+      <t-form-item :label="t('components.upstreamForm.healthCheck.active.portLabel')" name="checks.active.port">
+        <t-input-number
+          v-model="localUpstreamData.checks.active.port"
+          :placeholder="t('components.upstreamForm.healthCheck.active.portPlaceholder')"
+          theme="normal"
+          :min="1"
+          :max="65535"
+          style="width: 100%"
+        />
+      </t-form-item>
+      <t-row :gutter="[16, 0]">
+        <t-col :span="6">
+          <t-form-item
+            :label="t('components.upstreamForm.healthCheck.active.timeoutLabel')"
+            name="checks.active.timeout"
+            required-mark
+          >
+            <t-input-number
+              v-model="localUpstreamData.checks.active.timeout"
+              :placeholder="t('components.upstreamForm.healthCheck.active.timeoutPlaceholder')"
+              theme="normal"
+              :min="1"
+              style="width: 100%"
+            >
+              <template #suffix>s</template>
+            </t-input-number>
+          </t-form-item>
+        </t-col>
+        <t-col :span="6">
+          <t-form-item
+            :label="t('components.upstreamForm.healthCheck.active.concurrencyLabel')"
+            name="checks.active.concurrency"
+            required-mark
+          >
+            <t-input-number
+              v-model="localUpstreamData.checks.active.concurrency"
+              :placeholder="t('components.upstreamForm.healthCheck.active.concurrencyPlaceholder')"
+              theme="normal"
+              :min="1"
+              style="width: 100%"
+            />
+          </t-form-item>
+        </t-col>
+      </t-row>
+
+      <t-form-item
+        v-if="localUpstreamData.checks.active.type === 'https'"
+        :label="t('components.upstreamForm.healthCheck.active.httpsVerifyCertificateLabel')"
+        name="checks.active.https_verify_certificate"
+      >
+        <t-switch v-model="localUpstreamData.checks.active.https_verify_certificate" />
       </t-form-item>
 
       <t-divider align="left">{{ t('components.upstreamForm.healthCheck.active.healthy.title') }}</t-divider>
@@ -304,6 +364,20 @@
             />
           </t-form-item>
         </t-col>
+        <t-col v-if="localUpstreamData.checks.active.type != 'tcp'" :span="12">
+          <t-form-item
+            :label="t('components.upstreamForm.healthCheck.active.healthy.httpStatusesLabel')"
+            name="checks.active.healthy.http_statuses"
+          >
+            <number-tag-input
+              v-model="localUpstreamData.checks.active.healthy.http_statuses"
+              :placeholder="t('components.upstreamForm.healthCheck.active.healthy.httpStatusesPlaceholder')"
+              :tag-props="{ theme: 'primary', variant: 'light' }"
+              excess-tags-display="scroll"
+              auto-width
+            />
+          </t-form-item>
+        </t-col>
       </t-row>
 
       <t-divider align="left">{{ t('components.upstreamForm.healthCheck.active.unhealthy.title') }}</t-divider>
@@ -326,7 +400,7 @@
             </t-input-number>
           </t-form-item>
         </t-col>
-        <t-col :span="6">
+        <t-col v-if="localUpstreamData.checks.active.type != 'tcp'" :span="6">
           <t-form-item
             :label="t('components.upstreamForm.healthCheck.active.unhealthy.httpFailuresLabel')"
             name="checks.active.unhealthy.http_failures"
@@ -342,6 +416,36 @@
             />
           </t-form-item>
         </t-col>
+        <t-col :span="6">
+          <t-form-item
+            v-if="localUpstreamData.checks.active.type === 'tcp'"
+            :label="t('components.upstreamForm.healthCheck.active.unhealthy.tcpFailuresLabel')"
+            name="checks.active.unhealthy.tcp_failures"
+          >
+            <t-input-number
+              v-model="localUpstreamData.checks.active.unhealthy.tcp_failures"
+              :placeholder="t('components.upstreamForm.healthCheck.active.unhealthy.tcpFailuresPlaceholder')"
+              theme="normal"
+              :min="1"
+              :max="254"
+              style="width: 100%"
+            />
+          </t-form-item>
+        </t-col>
+        <t-col v-if="localUpstreamData.checks.active.type != 'tcp'" :span="12">
+          <t-form-item
+            :label="t('components.upstreamForm.healthCheck.active.unhealthy.httpStatusesLabel')"
+            name="checks.active.unhealthy.http_statuses"
+          >
+            <number-tag-input
+              v-model="localUpstreamData.checks.active.unhealthy.http_statuses"
+              :placeholder="t('components.upstreamForm.healthCheck.active.unhealthy.httpStatusesPlaceholder')"
+              :tag-props="{ theme: 'primary', variant: 'light' }"
+              excess-tags-display="scroll"
+              auto-width
+            />
+          </t-form-item>
+        </t-col>
       </t-row>
     </div>
   </t-form>
@@ -351,9 +455,16 @@
 import { FormInstanceFunctions, MessagePlugin } from 'tdesign-vue-next';
 import { reactive, ref, watch } from 'vue';
 
+import NumberTagInput from '@/components/number-tag-input/index.vue';
 import { t } from '@/locales';
 
-import { DISCOVERY_TYPE_OPTIONS, HEALTH_CHECK_RULES, LOAD_BALANCER_OPTIONS, PROTOCOL_OPTIONS } from './constants';
+import {
+  ACTIVE_HEALTH_CHECK_TYPES,
+  DISCOVERY_TYPE_OPTIONS,
+  HEALTH_CHECK_RULES,
+  LOAD_BALANCER_OPTIONS,
+  PROTOCOL_OPTIONS,
+} from './constants';
 
 interface UiNode {
   host: string;
@@ -375,9 +486,6 @@ const upstreamType = ref<'nodes' | 'discovery'>('nodes'); // Controls UI for nod
 // Internal representation for UI nodes using the local UiNode interface
 const uiNodes = ref<UiNode[]>([{ host: '', port: null, weight: 1 }]);
 
-// Local reactive state holding the data structure closer to APISIX schema
-// Note: localUpstreamData.nodes will store the {"host:port": weight} format
-// Use Record<string, any> for the internal state as well
 const localUpstreamData = reactive<Record<string, any>>(getDefaultUpstreamData());
 
 // --- Helper Functions ---
@@ -445,20 +553,36 @@ function getDefaultUpstreamData(): Record<string, any> {
     checks: {
       active: {
         type: 'http',
-        http_path: undefined,
+        http_path: '/',
         host: undefined,
+        port: undefined,
+        timeout: 1,
+        concurrency: 10,
+        https_verify_certificate: true,
+        req_headers: [],
         healthy: {
-          interval: undefined,
-          successes: undefined,
+          interval: 1,
+          successes: 2,
+          http_statuses: [200, 302],
         },
         unhealthy: {
-          interval: undefined,
-          http_failures: undefined,
+          interval: 1,
+          http_failures: 5,
+          tcp_failures: 2,
+          timeouts: 3,
+          http_statuses: [429, 404, 500, 501, 502, 503, 504, 505],
         },
       },
     },
   };
 }
+
+const performReset = () => {
+  Object.assign(localUpstreamData, getDefaultUpstreamData());
+  uiNodes.value = parseNodesToUi(undefined);
+  upstreamType.value = 'nodes';
+  isHealthCheckActive.value = false;
+};
 
 // --- Watchers for Data Synchronization ---
 
@@ -466,18 +590,13 @@ function getDefaultUpstreamData(): Record<string, any> {
 watch(
   () => props.modelValue,
   (newVal) => {
-    const defaults = getDefaultUpstreamData();
-    console.log('[UpstreamForm] 1231233');
     if (newVal === null || newVal === undefined) {
-      console.warn('[UpstreamForm] Entering RESET logic block.');
-      Object.assign(localUpstreamData, defaults);
-      uiNodes.value = parseNodesToUi(undefined);
-      upstreamType.value = 'nodes';
-      isHealthCheckActive.value = false;
+      performReset();
       return;
     }
 
     const incoming: Record<string, any> = newVal;
+    const defaults = getDefaultUpstreamData();
 
     // Determine upstream type (nodes vs discovery)
     if (incoming.discovery_type) {
@@ -499,27 +618,21 @@ watch(
 
     // Convert API nodes format to UI format
     if (upstreamType.value === 'nodes') {
-      // Cast incoming.nodes to the expected format for parseNodesToUi
       uiNodes.value = parseNodesToUi(incoming.nodes as Record<string, number> | undefined);
-      localUpstreamData.nodes = incoming.nodes; // Keep API format in local data for now
+      localUpstreamData.nodes = incoming.nodes;
     } else {
-      uiNodes.value = [{ host: '', port: null, weight: 1 }]; // Reset UI nodes if discovery
-      localUpstreamData.nodes = undefined; // Clear API nodes
+      uiNodes.value = [{ host: '', port: null, weight: 1 }];
+      localUpstreamData.nodes = undefined;
     }
 
-    // Set health check switch state
-    // Use optional chaining for safety as checks might not exist
-    isHealthCheckActive.value = !!localUpstreamData.checks?.active; // Enable switch if active checks exist
+    isHealthCheckActive.value = !!localUpstreamData.checks?.active;
 
-    // Ensure checks.active structure exists if switch is on but data was missing details
     if (isHealthCheckActive.value && !localUpstreamData.checks?.active) {
-      // Ensure checks object exists before assigning to active
       if (!localUpstreamData.checks) {
         localUpstreamData.checks = {};
       }
       localUpstreamData.checks.active = { ...defaults.checks.active };
     } else if (isHealthCheckActive.value && localUpstreamData.checks?.active) {
-      // Ensure nested healthy/unhealthy objects exist if active is present
       localUpstreamData.checks.active.healthy = {
         ...defaults.checks.active.healthy,
         ...(localUpstreamData.checks.active.healthy || {}),
@@ -576,10 +689,7 @@ defineExpose({
     }
     return formRef.value?.validate();
   },
-  // Expose the *final* data structure intended for the API as a plain object
   getApiFormattedData: (): Record<string, any> => {
-    // Manually trigger the final conversion and cleanup logic used in emitUpdate
-    // Clone the data first
     const result: Record<string, any> = JSON.parse(JSON.stringify(localUpstreamData));
 
     // Apply the same cleanup logic as in emitUpdate
@@ -615,45 +725,47 @@ defineExpose({
     console.log('Getting API Formatted Data:', result);
     return result; // Return the cleaned-up plain object
   },
+  resetForm: performReset,
 });
 </script>
 
 <style scoped lang="less">
 .node-item {
   margin-bottom: var(--td-comp-margin-s);
-  // Ensure nested form items don't inherit excessive bottom padding
   &:last-child {
-    margin-bottom: 0; // Remove margin for the last node row before the add button
+    margin-bottom: 0;
   }
 }
 
 .node-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  width: 100%;
 }
 
-.node-label {
-  flex-shrink: 0;
-  width: auto;
-  padding: 0 4px;
-  text-align: right;
-  color: var(--td-text-color-secondary);
+.node-label,
+.remove-button {
+  flex: 0 0 auto;
 }
 
 .node-input {
-  flex-grow: 1;
-  min-width: 150px;
+  flex: 1 1 200px;
+  min-width: 0;
 }
 
 .node-input-number {
-  width: 100px;
-  flex-shrink: 0;
+  flex: 0 0 80px;
+  min-width: 0;
+}
+
+.node-input :deep(.t-input__inner),
+.node-input-number :deep(.t-input-number__input) {
+  width: 100%;
 }
 
 .remove-button {
-  margin-left: 8px;
+  margin-top: 4px;
 }
 
 // Use t-row/t-col for better layout control than simple margin on unit

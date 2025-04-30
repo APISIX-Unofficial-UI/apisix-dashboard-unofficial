@@ -99,12 +99,20 @@ export default {
     title: '健康检查',
     active: {
       enableLabel: '启用主动健康检查',
+      healthCheckType: '健康检查类型',
       httpPathLabel: 'HTTP检查路径',
       httpPathPlaceholder: '请输入HTTP检查路径',
       httpPathRequired: '请填写HTTP检查路径',
       hostLabel: '主机名',
       hostPlaceholder: '请输入主机名',
       hostRequired: '请填写主机名',
+      timeoutLabel: '检查超时时间',
+      timeoutPlaceholder: '请输入检查超时时间',
+      concurrencyLabel: '并发检查数',
+      concurrencyPlaceholder: '请输入并发检查数',
+      portLabel: '检查端口',
+      portPlaceholder: '请输入检查端口',
+      httpsVerifyCertificateLabel: '验证SSL证书',
       healthy: {
         title: '健康判定条件',
         intervalLabel: '检查间隔',
@@ -113,6 +121,8 @@ export default {
         successesLabel: '成功次数',
         successesPlaceholder: '请输入判定为健康所需的成功次数',
         successesRequired: '请填写健康判定所需的成功次数',
+        httpStatusesLabel: 'HTTP状态码',
+        httpStatusesPlaceholder: '输入HTTP状态码并回车',
       },
       unhealthy: {
         title: '不健康判定条件',
@@ -122,6 +132,12 @@ export default {
         httpFailuresLabel: 'HTTP失败次数',
         httpFailuresPlaceholder: '请输入判定为不健康所需的HTTP失败次数',
         httpFailuresRequired: '请填写不健康判定所需的HTTP失败次数',
+        tcpFailuresLabel: 'TCP失败次数',
+        tcpFailuresPlaceholder: '请输入判定为不健康所需的TCP失败次数',
+        timeoutsLabel: '超时次数',
+        timeoutsPlaceholder: '请输入判定为不健康所需的超时次数',
+        httpStatusesLabel: 'HTTP状态码',
+        httpStatusesPlaceholder: '输入HTTP状态码并回车',
       },
     },
   },
@@ -129,5 +145,6 @@ export default {
   // 警告信息
   warnings: {
     invalidNodeFormat: '节点格式无效',
+    invalidHttpStatusCode: 'HTTP状态码必须是200-599之间的数字',
   },
 };

@@ -23,16 +23,18 @@ export const PROTOCOL_OPTIONS = [
   { label: 'gRPCS', value: 'grpcs' },
 ];
 
+export const ACTIVE_HEALTH_CHECK_TYPES = [
+  { label: 'HTTP', value: 'http' },
+  { label: 'HTTPS', value: 'https' },
+  { label: 'tcp', value: 'tcp' },
+];
+
 interface ValidationRule {
-  required: boolean;
+  required?: boolean;
   message: string;
 }
 
 export const HEALTH_CHECK_RULES: Record<string, ValidationRule[]> = {
-  'checks.active.http_path': [
-    { required: true, message: t('components.upstreamForm.healthCheck.active.httpPathRequired') },
-  ],
-  'checks.active.host': [{ required: true, message: t('components.upstreamForm.healthCheck.active.hostRequired') }],
   'checks.active.healthy.interval': [
     { required: true, message: t('components.upstreamForm.healthCheck.active.healthy.intervalRequired') },
   ],

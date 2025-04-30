@@ -19,16 +19,14 @@ const defaultRouterList: Array<RouteRecordRaw> = [
 // 存放固定路由
 export const fixedRouterList: Array<RouteRecordRaw> = mapModuleRouterList(fixedModules);
 
-// --- START: 添加测试 Harness 路由 ---
+// Harness 路由
 const harnessRoute: RouteRecordRaw = {
-  // 定义一个清晰的、不易冲突的路径
   path: '/dev/upstream-form-harness',
   name: 'UpstreamFormHarness',
-  component: () => import('@/components/upstream/upstream-form-harness.vue'), // 确认路径正确
+  component: () => import('@/components/upstream/upstream-form-harness.vue'),
   meta: {
-    title: 'Upstream表单测试工具', // 可选：设置页面标题
-    requiresAuth: false, // 可选：通常测试页面不需要登录
-    // layout: 'blank', // 可选：如果你的布局系统支持，可以指定一个空白或特殊的布局
+    title: 'UpstreamForm Harness',
+    requiresAuth: false,
   },
 };
 

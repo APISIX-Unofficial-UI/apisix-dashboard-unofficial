@@ -467,8 +467,17 @@ watch(
   () => props.modelValue,
   (newVal) => {
     const defaults = getDefaultUpstreamData();
-    // Ensure incoming value is treated as a plain object
-    const incoming: Record<string, any> = newVal || {};
+    console.log('[UpstreamForm] 1231233');
+    if (newVal === null || newVal === undefined) {
+      console.warn('[UpstreamForm] Entering RESET logic block.');
+      Object.assign(localUpstreamData, defaults);
+      uiNodes.value = parseNodesToUi(undefined);
+      upstreamType.value = 'nodes';
+      isHealthCheckActive.value = false;
+      return;
+    }
+
+    const incoming: Record<string, any> = newVal;
 
     // Determine upstream type (nodes vs discovery)
     if (incoming.discovery_type) {
@@ -536,7 +545,7 @@ function deepMergeChecks(defaults: any, incoming: any): any {
       unhealthy: { ...(defaults.active?.unhealthy || {}), ...(incoming.active.unhealthy || {}) },
     };
   }
-  // Add merging for passive checks here if implemented
+  // TODO(icebound): Add merging for passive checks here.
   // if (incoming.passive) { ... }
   return merged;
 }

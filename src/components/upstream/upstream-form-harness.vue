@@ -3,14 +3,12 @@
     <h1>Upstream 表单测试页面</h1>
 
     <t-card title="表单实例">
-      <upstream-form ref="upstreamFormRef" v-model="formData" @update:model-value="onFormUpdate" />
+      <upstream-form ref="upstreamFormRef" v-model="formData" />
     </t-card>
 
     <t-card title="操作" style="margin-top: 20px">
       <t-space direction="vertical" style="width: 100%">
         <t-space>
-          <t-button @click="loadInitialData('nodes')">加载 Nodes 示例</t-button>
-          <t-button @click="loadInitialData('discovery')">加载 Discovery 示例</t-button>
           <t-button @click="loadInitialData('empty')">加载空数据</t-button>
           <t-button theme="primary" @click="validateForm">校验表单</t-button>
           <t-button theme="success" @click="showApiData">显示 API 格式数据</t-button>
@@ -25,10 +23,6 @@
       <pre>{{ JSON.stringify(formData, null, 2) }}</pre>
     </t-card>
 
-    <t-card title="最后发出的数据 (@update:modelValue)" style="margin-top: 20px">
-      <pre>{{ JSON.stringify(lastEmittedData, null, 2) }}</pre>
-    </t-card>
-
     <t-card title="API 格式化数据 (getApiFormattedData)" style="margin-top: 20px">
       <pre>{{ JSON.stringify(apiFormattedData, null, 2) }}</pre>
     </t-card>
@@ -39,30 +33,19 @@
 import { MessagePlugin } from 'tdesign-vue-next';
 import { ref } from 'vue';
 
-// 调整为你组件的实际路径
 import UpstreamForm from '@/components/upstream/upstream-form.vue';
 
-// --- 组件引用 ---
-// 获取 UpstreamForm 的实例类型，注意这里需要组件本身暴露类型或使用 InstanceType
 const upstreamFormRef = ref<InstanceType<typeof UpstreamForm> | null>(null);
 
 // --- 数据引用 ---
-const formData = ref<Record<string, any> | null>(null); // v-model 绑定的数据
-const lastEmittedData = ref<Record<string, any> | null>(null); // 存储最后发出的事件 payload
+const formData = ref<Record<string, any> | null>(null);
 const apiFormattedData = ref<Record<string, any> | null>(null); // 存储 getApiFormattedData 的结果
 const validationResult = ref<boolean | null>(null);
 
 // --- 方法 ---
-const onFormUpdate = (newValue: Record<string, any>) => {
-  console.log('测试页面: 收到 update:modelValue', newValue);
-  lastEmittedData.value = newValue;
-};
-
 const loadInitialData = (type: 'nodes' | 'discovery' | 'empty') => {
   validationResult.value = null;
   apiFormattedData.value = null;
-  lastEmittedData.value = null; // 加载时清除之前发出的数据
-
   if (type === 'nodes') {
     formData.value = {
       /* ... 节点示例数据 ... */
@@ -72,7 +55,7 @@ const loadInitialData = (type: 'nodes' | 'discovery' | 'empty') => {
       /* ... 服务发现示例数据 ... */
     };
   } else {
-    formData.value = null; // 或者 {}
+    formData.value = null;
   }
   console.log('测试页面: 加载数据', formData.value);
 };
@@ -115,9 +98,6 @@ loadInitialData('empty');
 </script>
 
 <style scoped>
-pre {
-  /* ... pre 样式 ... */
-}
 .t-card {
   margin-bottom: 20px;
 }

@@ -13,9 +13,9 @@
 
     <!-- 2. Upstream Type (Nodes or Discovery) -->
     <t-form-item :label="t('components.upstreamForm.upstreamType.label')" name="upstreamTypeSelector" required-mark>
-      <t-radio-group v-model="upstreamType">
-        <t-radio value="nodes">{{ t('components.upstreamForm.upstreamType.nodes') }}</t-radio>
-        <t-radio value="discovery">{{ t('components.upstreamForm.upstreamType.discovery') }}</t-radio>
+      <t-radio-group v-model="upstreamType" variant="primary-filled">
+        <t-radio-button value="nodes">{{ t('components.upstreamForm.upstreamType.nodes') }}</t-radio-button>
+        <t-radio-button value="discovery">{{ t('components.upstreamForm.upstreamType.discovery') }}</t-radio-button>
       </t-radio-group>
     </t-form-item>
 
@@ -39,7 +39,7 @@
           <span class="node-label">{{ t('components.upstreamForm.nodes.portLabel') }}</span>
           <t-input-number
             v-model="node.port"
-            class="node-input-number"
+            class="node-input-number node-input-port"
             :placeholder="t('components.upstreamForm.nodes.portPlaceholder')"
             :min="1"
             :max="65535"
@@ -49,7 +49,7 @@
           <span class="node-label">{{ t('components.upstreamForm.nodes.weightLabel') }}</span>
           <t-input-number
             v-model="node.weight"
-            class="node-input-number"
+            class="node-input-number node-input-weight"
             :placeholder="t('components.upstreamForm.nodes.weightPlaceholder')"
             :min="0"
             required-mark
@@ -93,14 +93,21 @@
         />
       </t-form-item>
       <t-form-item :label="t('components.upstreamForm.discovery.hostHeaderLabel')" name="pass_host">
-        <t-select
+        <t-radio-group
           v-model="localUpstreamData.pass_host"
+          variant="primary-filled"
           :placeholder="t('components.upstreamForm.discovery.hostHeaderPlaceholder')"
         >
-          <t-option value="pass" :label="t('components.upstreamForm.discovery.hostHeaderPass')" />
-          <t-option value="node" :label="t('components.upstreamForm.discovery.hostHeaderNode')" />
-          <t-option value="rewrite" :label="t('components.upstreamForm.discovery.hostHeaderRewrite')" />
-        </t-select>
+          <t-radio-button value="pass">
+            {{ t('components.upstreamForm.discovery.hostHeaderPass') }}
+          </t-radio-button>
+          <t-radio-button value="node">
+            {{ t('components.upstreamForm.discovery.hostHeaderNode') }}
+          </t-radio-button>
+          <t-radio-button value="rewrite"
+            >{{ t('components.upstreamForm.discovery.hostHeaderRewrite') }}
+          </t-radio-button>
+        </t-radio-group>
       </t-form-item>
       <t-form-item
         v-if="localUpstreamData.pass_host === 'rewrite'"
@@ -250,14 +257,16 @@
         name="checks.active.type"
         required-mark
       >
-        <t-select v-model="localUpstreamData.checks.active.type">
-          <t-option
+        <t-radio-group v-model="localUpstreamData.checks.active.type" variant="primary-filled">
+          <t-radio-button
             v-for="item in ACTIVE_HEALTH_CHECK_TYPES"
             :key="item.value"
             :value="item.value"
             :label="item.label"
-          />
-        </t-select>
+          >
+            {{ item.label }}
+          </t-radio-button>
+        </t-radio-group>
       </t-form-item>
       <t-form-item
         :label="t('components.upstreamForm.healthCheck.active.httpPathLabel')"
@@ -452,6 +461,7 @@
 </template>
 
 <script setup lang="ts">
+import { cloneDeep } from 'lodash';
 import { FormInstanceFunctions, MessagePlugin } from 'tdesign-vue-next';
 import { reactive, ref, watch } from 'vue';
 
@@ -526,7 +536,6 @@ function convertNodesToApi(nodesArray: UiNode[]): Record<string, number> | undef
       validNodes++;
     }
   });
-  // Return undefined if no valid nodes to avoid sending empty {}
   return validNodes > 0 ? apiNodes : undefined;
 }
 
@@ -559,6 +568,7 @@ function getDefaultUpstreamData(): Record<string, any> {
         timeout: 1,
         concurrency: 10,
         https_verify_certificate: true,
+        // TODO(icebound): Add req_headers features.
         req_headers: [],
         healthy: {
           interval: 1,
@@ -625,22 +635,16 @@ watch(
       localUpstreamData.nodes = undefined;
     }
 
-    isHealthCheckActive.value = !!localUpstreamData.checks?.active;
+    isHealthCheckActive.value = Boolean(localUpstreamData.checks?.active);
 
-    if (isHealthCheckActive.value && !localUpstreamData.checks?.active) {
-      if (!localUpstreamData.checks) {
-        localUpstreamData.checks = {};
+    if (isHealthCheckActive.value) {
+      if (localUpstreamData.checks.active.type === 'tcp') {
+        delete localUpstreamData.checks.active.http_path;
+        delete localUpstreamData.checks.active.host;
       }
-      localUpstreamData.checks.active = { ...defaults.checks.active };
-    } else if (isHealthCheckActive.value && localUpstreamData.checks?.active) {
-      localUpstreamData.checks.active.healthy = {
-        ...defaults.checks.active.healthy,
-        ...(localUpstreamData.checks.active.healthy || {}),
-      };
-      localUpstreamData.checks.active.unhealthy = {
-        ...defaults.checks.active.unhealthy,
-        ...(localUpstreamData.checks.active.unhealthy || {}),
-      };
+      if (localUpstreamData.checks.active.type !== 'https') {
+        delete localUpstreamData.checks.active.https_verify_certificate;
+      }
     }
   },
   { immediate: true, deep: false }, // Use deep: false initially, rely on specific watchers below for deep changes
@@ -690,40 +694,64 @@ defineExpose({
     return formRef.value?.validate();
   },
   getApiFormattedData: (): Record<string, any> => {
-    const result: Record<string, any> = JSON.parse(JSON.stringify(localUpstreamData));
-
-    // Apply the same cleanup logic as in emitUpdate
+    const result: Record<string, any> = cloneDeep(localUpstreamData);
     if (upstreamType.value === 'nodes') {
       delete result.discovery_type;
       delete result.service_name;
       result.nodes = convertNodesToApi(uiNodes.value);
-      if (!result.nodes) delete result.nodes;
+      if (!result.nodes || Object.keys(result.nodes).length === 0) {
+        delete result.nodes;
+      }
     } else {
       delete result.nodes;
-      if (!result.discovery_type) delete result.service_name;
-    }
-    if (result.pass_host !== 'rewrite') delete result.upstream_host;
-
-    if (!isHealthCheckActive.value) {
-      delete result.checks;
-    } else if (result.checks?.active) {
-      // Ensure type exists if active checks are enabled
-      if (!result.checks.active.type) {
-        result.checks.active.type = 'http';
+      if (!result.discovery_type) {
+        delete result.service_name;
       }
-      // Optional cleanup for empty strings within active checks
-      if (result.checks.active.http_path === '') delete result.checks.active.http_path;
-      if (result.checks.active.host === '') delete result.checks.active.host;
     }
 
-    // Remove undefined top-level keys
+    if (result.pass_host !== 'rewrite') {
+      delete result.upstream_host;
+    }
+
+    if (!isHealthCheckActive.value || !result.checks?.active) {
+      if (result.checks) {
+        delete result.checks.active;
+        if (!result.checks.passive) {
+          delete result.checks;
+        }
+      }
+    } else {
+      const activeChecks = result.checks.active;
+      const { type } = activeChecks;
+
+      if (type === 'tcp') {
+        delete activeChecks.http_path;
+        delete activeChecks.host;
+        delete activeChecks.https_verify_certificate;
+        if (activeChecks.healthy) {
+          delete activeChecks.healthy.http_statuses;
+        }
+        if (activeChecks.unhealthy) {
+          delete activeChecks.unhealthy.http_statuses;
+          delete activeChecks.unhealthy.http_failures;
+        }
+      } else if (type !== 'https') {
+        delete activeChecks.https_verify_certificate;
+      }
+      if (activeChecks.http_path === '') delete activeChecks.http_path;
+      if (activeChecks.host === '') delete activeChecks.host;
+    }
+
     Object.keys(result).forEach((key) => {
       if (result[key] === undefined) {
         delete result[key];
       }
     });
-    console.log('Getting API Formatted Data:', result);
-    return result; // Return the cleaned-up plain object
+
+    if (result.checks && Object.keys(result.checks).length === 0) {
+      delete result.checks;
+    }
+    return result;
   },
   resetForm: performReset,
 });

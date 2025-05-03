@@ -7,24 +7,29 @@
 
 .node-row {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
+  width: 100%;
+  flex-wrap: nowrap;
 }
 
 .node-label,
 .remove-button {
   flex: 0 0 auto;
+  margin-top: 4px;
 }
 
 .node-input {
-  flex: 1 1 200px;
-  min-width: 0;
+  flex: 1 1 auto;
+  min-width: 200px;
 }
 
-.node-input-number {
-  flex: 0 0 80px;
-  min-width: 0;
+.node-input-port {
+  width: 70px;
+}
+
+.node-input-weight {
+  width: 110px; 
 }
 
 .node-input :deep(.t-input__inner),
@@ -32,9 +37,6 @@
   width: 100%;
 }
 
-.remove-button {
-  margin-top: 4px;
-}
 
 // Use t-row/t-col for better layout control than simple margin on unit
 :deep(.t-input-number__suffix) {

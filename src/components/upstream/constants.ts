@@ -1,3 +1,5 @@
+import { FormRule } from 'tdesign-vue-next';
+
 import { t } from '@/locales';
 
 export const LOAD_BALANCER_OPTIONS = [
@@ -29,12 +31,7 @@ export const ACTIVE_HEALTH_CHECK_TYPES = [
   { label: 'tcp', value: 'tcp' },
 ];
 
-interface ValidationRule {
-  required?: boolean;
-  message: string;
-}
-
-export const HEALTH_CHECK_RULES: Record<string, ValidationRule[]> = {
+export const HEALTH_CHECK_RULES: Record<string, FormRule[]> = {
   'checks.active.healthy.interval': [
     { required: true, message: t('components.upstreamForm.healthCheck.active.healthy.intervalRequired') },
   ],

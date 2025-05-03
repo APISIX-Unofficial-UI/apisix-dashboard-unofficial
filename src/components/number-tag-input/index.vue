@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { TagInput as TTagInput, TagInputProps, TagProps } from 'tdesign-vue-next'; // 假设可以导入类型
+import { TagInput as TTagInput, TagInputProps, TagProps } from 'tdesign-vue-next';
 import { computed, WritableComputedRef } from 'vue';
 
 interface Props {

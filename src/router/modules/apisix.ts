@@ -6,7 +6,7 @@ import Layout from '@/layouts/index.vue';
 export default [
   {
     path: '/apisix',
-    component: Layout,
+    component: async () => Layout,
     redirect: '/apisix/route',
     name: 'apisix',
     meta: {

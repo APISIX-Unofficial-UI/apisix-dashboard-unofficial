@@ -12,4 +12,5 @@ _site
 temp*
 static/
 !.prettierrc.js
-src/api/*
+src/api/apisix/admin/*
+src/api/apisix/ctrl/*

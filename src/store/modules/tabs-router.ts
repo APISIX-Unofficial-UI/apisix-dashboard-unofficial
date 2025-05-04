@@ -83,7 +83,3 @@ export const useTabsRouterStore = defineStore('tabsRouter', {
   },
   persist: true,
 });
-
-export function getTabsRouterStore() {
-  return useTabsRouterStore(store);
-}

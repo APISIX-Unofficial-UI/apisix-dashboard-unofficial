@@ -715,13 +715,13 @@ const removeNode = (index: number) => {
 
 // --- Expose Methods ---
 defineExpose({
-  validate: () => {
+  validate: async () => {
     if (upstreamType.value === 'nodes') {
       // Validate each node's host, port, and weight
       for (const node of uiNodes.value) {
         if (!node.host || !node.port || node.weight === null || node.weight < 0) {
           MessagePlugin.warning(t('components.upstreamForm.warnings.invalidNodeFormat'));
-          return false;
+          return false; // TODO 返回验证信息而不是 false
         }
       }
     }

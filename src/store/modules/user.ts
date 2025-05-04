@@ -15,6 +15,12 @@ type UserStore = {
   sessionTimer: ReturnType<typeof setInterval> | null;
 };
 
+export type LoginOptions = {
+  ctrlEndpoint?: string;
+  ctrlKey?: string;
+  keepLogin?: boolean;
+};
+
 /**
  * 检查会话过期
  * @param stateCtx
@@ -55,12 +61,12 @@ export const useUserStore = defineStore('user', {
      * @param ctrlKey
      * @param keepLogin 保持登录状态，否则10分钟过期自动登出
      */
-    async login(adminEndpoint: string, adminKey: string, ctrlEndpoint: string, ctrlKey: string, keepLogin: boolean) {
+    async login(adminEndpoint: string, adminKey: string, opts?: LoginOptions) {
       this.adminEndpoint = adminEndpoint;
       this.adminKey = adminKey;
-      this.ctrlEndpoint = ctrlEndpoint;
-      this.ctrlKey = ctrlKey;
-      this.keepLogin = keepLogin;
+      this.ctrlEndpoint = opts?.ctrlEndpoint;
+      this.ctrlKey = opts?.ctrlKey;
+      this.keepLogin = opts?.keepLogin || false;
 
       // 检查key有效性
       try {
@@ -70,7 +76,7 @@ export const useUserStore = defineStore('user', {
       }
 
       this.loginAt = new Date().getTime();
-      if (!keepLogin) {
+      if (!this.keepLogin) {
         this.sessionTimer = setInterval(checkSession(this), 1000);
       }
     },

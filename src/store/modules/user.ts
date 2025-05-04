@@ -23,15 +23,15 @@ export type LoginOptions = {
 
 /**
  * 检查会话过期
- * @param stateCtx
+ * @param storeCtx
  * @returns
  */
-const checkSession = (stateCtx: ReturnType<typeof useUserStore>) => {
+const checkSession = (storeCtx: ReturnType<typeof useUserStore>) => {
   return () => {
     // 10 minutes
-    if (new Date().getTime() - stateCtx.loginAt > 10 * 60 * 1000) {
-      clearInterval(stateCtx.sessionTimer);
-      stateCtx.logout();
+    if (new Date().getTime() - storeCtx.loginAt > 10 * 60 * 1000) {
+      clearInterval(storeCtx.sessionTimer);
+      storeCtx.logout();
     }
   };
 };
@@ -126,10 +126,7 @@ export const useUserStore = defineStore('user', {
       if (ctx.store.$state.userInfo != null) {
         // 刷新页面后需要重设timer
         if (!ctx.store.$state.keepLogin) {
-          ctx.store.$state.sessionTimer = setInterval(
-            checkSession(ctx.store.$state as ReturnType<typeof useUserStore>),
-            1000,
-          );
+          ctx.store.$state.sessionTimer = setInterval(checkSession(ctx.store as ReturnType<typeof useUserStore>), 1000);
         }
 
         // 根据用户权限初始化路由

@@ -19,7 +19,26 @@ const defaultRouterList: Array<RouteRecordRaw> = [
 // 存放固定路由
 export const fixedRouterList: Array<RouteRecordRaw> = mapModuleRouterList(fixedModules);
 
-export const allRoutes = [...fixedRouterList, ...defaultRouterList];
+// Harness 路由
+const harnessRoute: RouteRecordRaw = {
+  path: '/dev/upstream-form-harness',
+  name: 'UpstreamFormHarness',
+  component: () => import('@/components/upstream/upstream-form-harness.vue'),
+  meta: {
+    title: 'UpstreamForm Harness',
+    requiresAuth: false,
+  },
+};
+
+const devRoutes: Array<RouteRecordRaw> = [];
+
+// 仅在开发模式下添加 Harness 路由
+if (import.meta.env.DEV) {
+  devRoutes.push(harnessRoute);
+  console.log('[Router] Added development route:', harnessRoute.path); // 方便调试时确认
+}
+
+export const allRoutes = [...fixedRouterList, ...defaultRouterList, ...devRoutes];
 
 // 固定路由模块转换为路由
 export function mapModuleRouterList(modules: Record<string, unknown>): Array<RouteRecordRaw> {
@@ -58,6 +77,11 @@ export const getRoutesExpanded = () => {
 
 export const getActive = (maxLevel = 3): string => {
   // 非组件内调用必须通过Router实例获取当前路由
+  // 确保 router 实例在使用前已创建
+  if (!router) {
+    console.warn('[Router] getActive called before router instance is created.');
+    return '';
+  }
   const route = router.currentRoute.value;
 
   if (!route.path) {

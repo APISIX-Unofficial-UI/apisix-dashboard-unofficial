@@ -1,12 +1,7 @@
 export default {
-  // 负载均衡
-  loadBalancer: {
-    label: '负载均衡算法',
-    placeholder: '请选择负载均衡算法',
-    roundRobin: '带权轮询',
-    consistentHash: '一致性哈希',
-    ewma: '指数加权平均(EWMA)',
-    leastConn: '最少连接数',
+  // 上游基础信息
+  basic: {
+    title: '上游基础信息',
   },
 
   // 上游类型
@@ -35,17 +30,39 @@ export default {
     typePlaceholder: '请选择服务发现类型',
     serviceNameLabel: '服务名称',
     serviceNamePlaceholder: '请输入服务名称',
-    hostHeaderLabel: 'Host Header传递方式',
-    hostHeaderPlaceholder: '请选择Host Header传递方式',
-    hostHeaderPass: '透传',
-    hostHeaderNode: '使用节点',
-    hostHeaderRewrite: '重写',
+  },
+
+  // 协议配置
+  scheme: {
+    label: '协议',
+    placeholder: '请选择协议',
+  },
+
+  // Host Header传递方式
+  hostHeader: {
+    label: 'Host Header传递方式',
+    placeholder: '请选择Host Header传递方式',
+    pass: '透传',
+    node: '使用节点',
+    rewrite: '重写',
     upstreamHostLabel: '重写后的上游Host',
     upstreamHostPlaceholder: '请输入重写后的上游Host',
   },
 
+  // 负载均衡
+  loadBalancer: {
+    title: '负载均衡',
+    label: '负载均衡算法',
+    placeholder: '请选择负载均衡算法',
+    roundRobin: '带权轮询',
+    consistentHash: '一致性哈希',
+    ewma: '指数加权平均(EWMA)',
+    leastConn: '最少连接数',
+  },
+
   // 重试配置
   retries: {
+    title: '重试和超时',
     label: '重试次数',
     placeholder: '请输入重试次数',
   },
@@ -53,12 +70,6 @@ export default {
   retryTimeout: {
     label: '重试超时',
     placeholder: '请输入重试超时时间',
-  },
-
-  // 协议配置
-  protocol: {
-    label: '协议',
-    placeholder: '请选择协议',
   },
 
   // 连接超时配置

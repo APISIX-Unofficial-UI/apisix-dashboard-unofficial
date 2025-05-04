@@ -7,11 +7,11 @@
     label-width="0"
     @submit="onSubmit"
   >
-    <t-form-item name="apisixAdminEndpoint">
+    <t-form-item name="adminEndpoint">
       <t-input
-        v-model="formData.apisixAdminEndpoint"
+        v-model="formData.adminEndpoint"
         size="large"
-        :placeholder="`${t('pages.login.input.apisixAdminEndpoint')}：http://127.0.0.1:9180`"
+        :placeholder="`${t('pages.login.input.adminEndpoint')}：http://127.0.0.1:9180`"
       >
         <template #prefix-icon>
           <t-icon name="user" />
@@ -19,25 +19,42 @@
       </t-input>
     </t-form-item>
 
-    <t-form-item name="apisixControlEndpoint">
+    <t-form-item name="adminKey">
       <t-input
-        v-model="formData.apisixControlEndpoint"
-        size="large"
-        :placeholder="`${t('pages.login.input.apisixControlEndpoint')}：http://127.0.0.1:9090`"
-      >
-        <template #prefix-icon>
-          <t-icon name="user" />
-        </template>
-      </t-input>
-    </t-form-item>
-
-    <t-form-item name="password">
-      <t-input
-        v-model="formData.apisixAdminKey"
+        v-model="formData.adminKey"
         size="large"
         :type="showPsw ? 'text' : 'password'"
         clearable
-        :placeholder="`${t('pages.login.input.apisixAdminKey')}：xxxxxxxxxxxx`"
+        :placeholder="`${t('pages.login.input.adminKey')}：xxxxxxxxxxxx`"
+      >
+        <template #prefix-icon>
+          <t-icon name="lock-on" />
+        </template>
+        <template #suffix-icon>
+          <t-icon :name="showPsw ? 'browse' : 'browse-off'" @click="showPsw = !showPsw" />
+        </template>
+      </t-input>
+    </t-form-item>
+
+    <t-form-item name="ctrlEndpoint">
+      <t-input
+        v-model="formData.ctrlEndpoint"
+        size="large"
+        :placeholder="`${t('pages.login.input.ctrlEndpoint')}：http://127.0.0.1:9090`"
+      >
+        <template #prefix-icon>
+          <t-icon name="user" />
+        </template>
+      </t-input>
+    </t-form-item>
+
+    <t-form-item name="ctrlKey">
+      <t-input
+        v-model="formData.ctrlKey"
+        size="large"
+        :type="showPsw ? 'text' : 'password'"
+        clearable
+        :placeholder="`${t('pages.login.input.ctrlKey')}：xxxxxxxxxxxx`"
       >
         <template #prefix-icon>
           <t-icon name="lock-on" />
@@ -73,23 +90,23 @@ const env = import.meta.env.MODE || 'development';
 
 const INITIAL_DATA = {
   // 如果是mock模式 或 启用Vite代理
-  apisixAdminEndpoint:
+  adminEndpoint:
     env === 'mock' || import.meta.env.VITE_ENABLE_VITE_PROXY === 'true'
       ? import.meta.env.VITE_APISIX_ADMIN_API_PROXY_ENDPOINT // 走本地Mock拦截 或 Vite 代理
       : import.meta.env.VITE_APISIX_ADMIN_API_ENDPOINT, // 直连
+  adminKey: '',
   // 如果是mock模式 或 没启用Vite代理
-  apisixControlEndpoint:
+  ctrlEndpoint:
     env === 'mock' || import.meta.env.VITE_ENABLE_VITE_PROXY === 'true'
       ? import.meta.env.VITE_APISIX_CONTROL_API_PROXY_ENDPOINT // 走本地Mock拦截 或 Vite 代理
       : import.meta.env.VITE_APISIX_CONTROL_API_ENDPOINT, // 直连
-  apisixAdminKey: '',
+  ctrlKey: '',
   keepLogin: false,
 };
 
 const FORM_RULES: Record<string, FormRule[]> = {
-  apisixAdminEndpoint: [{ required: true, message: t('pages.login.required.apisixAdminEndpoint'), type: 'error' }],
-  apisixControlEndpoint: [{ required: false, message: t('pages.login.required.apisixAdminEndpoint'), type: 'error' }],
-  apisixAdminKey: [{ required: true, message: t('pages.login.required.apisixAdminKey'), type: 'error' }],
+  adminEndpoint: [{ required: true, message: t('pages.login.required.adminEndpoint'), type: 'error' }],
+  adminKey: [{ required: true, message: t('pages.login.required.adminKey'), type: 'error' }],
 };
 
 const form = ref<FormInstanceFunctions>();
@@ -103,9 +120,10 @@ const onSubmit = async (ctx: SubmitContext) => {
   if (ctx.validateResult === true) {
     try {
       await userStore.login(
-        formData.value.apisixAdminEndpoint,
-        formData.value.apisixControlEndpoint,
-        formData.value.apisixAdminKey,
+        formData.value.adminEndpoint,
+        formData.value.adminKey,
+        formData.value.ctrlEndpoint,
+        formData.value.ctrlKey,
         formData.value.keepLogin,
       );
 

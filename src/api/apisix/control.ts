@@ -8,7 +8,7 @@ const axiosInstance = axios.create();
 
 axiosInstance.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
   const userStore = useUserStore();
-  config.baseURL = userStore.apisixControlEndpoint;
+  config.baseURL = userStore.ctrlEndpoint;
   return config;
 });
 

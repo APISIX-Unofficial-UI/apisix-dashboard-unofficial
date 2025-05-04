@@ -4,19 +4,42 @@ import { PluginApi } from '@/api/apisix/admin';
 import { usePermissionStore } from '@/store';
 import type { UserInfo } from '@/types/interface';
 
-const InitUserInfo: UserInfo = {
-  name: '', // 用户名，用于展示在页面右上角头像处
-  roles: ['all'], // 前端权限模型使用 如果使用请配置modules/permission-fe.ts使用
+type UserStore = {
+  adminEndpoint: string | null;
+  adminKey: string | null;
+  ctrlEndpoint: string | null;
+  ctrlKey: string | null;
+  userInfo: UserInfo | null; // 用户信息 存在视为已登录状态
+  keepLogin: boolean;
+  loginAt: number | null; // 毫秒Unix时间戳
+  sessionTimer: ReturnType<typeof setInterval> | null;
+};
+
+/**
+ * 检查会话过期
+ * @param stateCtx
+ * @returns
+ */
+const checkSession = (stateCtx: ReturnType<typeof useUserStore>) => {
+  return () => {
+    // 10 minutes
+    if (new Date().getTime() - stateCtx.loginAt > 10 * 60 * 1000) {
+      clearInterval(stateCtx.sessionTimer);
+      stateCtx.logout();
+    }
+  };
 };
 
 export const useUserStore = defineStore('user', {
-  state: () => ({
+  state: (): UserStore => ({
+    adminEndpoint: null,
+    adminKey: null,
+    ctrlEndpoint: null,
+    ctrlKey: null,
+    userInfo: null,
     keepLogin: false,
-    token: '', // 默认token不走权限
-    apisixAdminEndpoint: '',
-    apisixControlEndpoint: '',
-    apisixAdminKey: '',
-    userInfo: { ...InitUserInfo },
+    loginAt: null,
+    sessionTimer: null,
   }),
   getters: {
     roles: (state) => {
@@ -24,44 +47,100 @@ export const useUserStore = defineStore('user', {
     },
   },
   actions: {
-    async login(
-      apisixAdminEndpoint: string,
-      apisixControlEndpoint: string,
-      apisixAdminKey: string,
-      keepLogin?: boolean,
-    ) {
-      this.apisixAdminEndpoint = apisixAdminEndpoint;
-      this.apisixControlEndpoint = apisixControlEndpoint;
-      this.apisixAdminKey = apisixAdminKey;
-
-      await PluginApi.apisixAdminPluginsListGet();
-
+    /**
+     * 登录
+     * @param adminEndpoint
+     * @param adminKey
+     * @param ctrlEndpoint
+     * @param ctrlKey
+     * @param keepLogin 保持登录状态，否则10分钟过期自动登出
+     */
+    async login(adminEndpoint: string, adminKey: string, ctrlEndpoint: string, ctrlKey: string, keepLogin: boolean) {
+      this.adminEndpoint = adminEndpoint;
+      this.adminKey = adminKey;
+      this.ctrlEndpoint = ctrlEndpoint;
+      this.ctrlKey = ctrlKey;
       this.keepLogin = keepLogin;
 
-      this.token = 'main_token';
+      // 检查key有效性
+      try {
+        await PluginApi.apisixAdminPluginsListGet();
+      } catch (e) {
+        throw new Error(`Admin Key无效`, { cause: e });
+      }
+
+      this.loginAt = new Date().getTime();
+      if (!keepLogin) {
+        this.sessionTimer = setInterval(checkSession(this), 1000);
+      }
     },
+    /**
+     * 获取用户信息
+     */
     async getUserInfo() {
-      await PluginApi.apisixAdminPluginsListGet();
+      if (this.userInfo !== null) {
+        return;
+      }
+
+      // 检查key有效性
+      try {
+        await PluginApi.apisixAdminPluginsListGet();
+      } catch (e) {
+        throw new Error(`Admin Key无效`, { cause: e });
+      }
+
       this.userInfo = {
         name: 'admin',
         roles: ['all'], // 前端权限模型使用 如果使用请配置modules/permission-fe.ts使用
       };
+
+      // 根据用户权限初始化路由
+      const permissionStore = usePermissionStore();
+      permissionStore.initRoutes(this.userInfo.roles);
     },
+    /**
+     * 退出登录
+     */
     async logout() {
-      this.token = '';
-      this.userInfo = { ...InitUserInfo };
+      if (this.sessionTimer != null) {
+        clearInterval(this.sessionTimer);
+      }
+
+      this.$reset();
+
+      // 重置路由
+      const permissionStore = usePermissionStore();
+      permissionStore.initRoutes([]);
     },
   },
   persist: {
+    storage: sessionStorage,
     afterRestore: (ctx) => {
-      if (!ctx.store.$state.keepLogin) {
-        ctx.store.$reset();
-      }
+      // userInfo存在视为已登录状态
+      if (ctx.store.$state.userInfo != null) {
+        // 刷新页面后需要重设timer
+        if (!ctx.store.$state.keepLogin) {
+          ctx.store.$state.sessionTimer = setInterval(
+            checkSession(ctx.store.$state as ReturnType<typeof useUserStore>),
+            1000,
+          );
+        }
 
-      const permissionStore = usePermissionStore();
-      permissionStore.initRoutes(ctx.store.$state.userInfo.roles);
+        // 根据用户权限初始化路由
+        const permissionStore = usePermissionStore();
+        permissionStore.initRoutes(ctx.store.$state.userInfo.roles);
+      }
     },
     key: 'user',
-    paths: ['keepLogin', 'token', 'apisixAdminEndpoint', 'apisixControlEndpoint', 'apisixAdminKey'],
+    paths: [
+      'adminEndpoint',
+      'adminKey',
+      'ctrlEndpoint',
+      'ctrlKey',
+      'userInfo',
+      'keepLogin',
+      'loginAt',
+      // 'sessionTimer',
+    ],
   },
 });

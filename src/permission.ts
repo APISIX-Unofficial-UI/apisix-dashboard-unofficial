@@ -16,7 +16,7 @@ router.beforeEach(async (to, from, next) => {
 
   const userStore = useUserStore();
 
-  if (userStore.token) {
+  if (userStore.adminKey) {
     if (to.path === '/login') {
       next();
       return;

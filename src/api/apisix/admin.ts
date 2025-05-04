@@ -8,8 +8,8 @@ const axiosInstance = axios.create();
 
 axiosInstance.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
   const userStore = useUserStore();
-  config.baseURL = userStore.apisixAdminEndpoint;
-  config.headers.set('X-API-Key', userStore.apisixAdminKey);
+  config.baseURL = userStore.adminEndpoint;
+  config.headers.set('X-API-Key', userStore.adminKey);
   return config;
 });
 

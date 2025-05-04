@@ -4,13 +4,13 @@ export default {
   signIn: 'Sign in',
   refresh: 'refresh',
   input: {
-    apisixAdminEndpoint: 'AdminEndpoint',
-    apisixControlEndpoint: 'ControlEndpoint',
-    apisixAdminKey: 'AdminKey',
+    adminEndpoint: 'AdminEndpoint',
+    adminKey: 'AdminKey',
+    ctrlEndpoint: 'ControlEndpoint',
+    ctrlKey: 'ControllKey',
   },
   required: {
-    apisixAdminEndpoint: 'AdminEndpoint is required',
-    apisixControlEndpoint: 'ControlEndpoint is required',
-    apisixAdminKey: 'AdminKey is required',
+    adminEndpoint: 'AdminEndpoint is required',
+    adminKey: 'AdminKey is required',
   },
 };

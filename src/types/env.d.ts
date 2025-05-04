@@ -5,12 +5,11 @@ export interface ImportMetaEnv {
   readonly VITE_ENABLE_VITE_PROXY: string;
 
   // Apisix Admin API
-  readonly VITE_APISIX_ADMIN_API_ENDPOINT: string;
-  // Apisix Admin API Vite 代理挂载路径
-  readonly VITE_APISIX_ADMIN_API_PROXY_ENDPOINT: string;
-
+  readonly VITE_ADMIN_API_ENDPOINT_PRESET: string;
+  readonly VITE_ADMIN_API_KEY_PRESET: string;
+  readonly VITE_ADMIN_API_PROXY_TARGET: string;
   // Apisix Control API
-  readonly VITE_APISIX_CONTROL_API_ENDPOINT: string;
-  // Apisix Control API Vite 代理挂载路径
-  readonly VITE_APISIX_CONTROL_API_PROXY_ENDPOINT: string;
+  readonly VITE_CTRL_API_ENDPOINT_PRESET: string;
+  readonly VITE_CTRL_API_KEY_PRESET: string;
+  readonly VITE_CTRL_API_PROXY_TARGET: string;
 }

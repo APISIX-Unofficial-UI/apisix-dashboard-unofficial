@@ -312,16 +312,6 @@ const headerAffixedTop = computed(
 </script>
 
 <style lang="less" scoped>
-.payment-col {
-  display: flex;
-
-  .trend-container {
-    display: flex;
-    align-items: center;
-    margin-left: var(--td-comp-margin-s);
-  }
-}
-
 .list-card-container {
   padding: var(--td-comp-paddingTB-xxl) var(--td-comp-paddingLR-xxl);
 

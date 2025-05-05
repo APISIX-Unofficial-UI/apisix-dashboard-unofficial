@@ -1,12 +1,12 @@
 <template>
   <div>
-    <t-card :bordered="false" :title="t('pages.apisixConsumer.title')">
-      <pre>{{ t('pages.apisixConsumer.description') }}</pre>
+    <t-card class="title-card" :bordered="false" :title="t('pages.apisixConsumer.title')">
+      <p>{{ t('pages.apisixConsumer.description') }}</p>
     </t-card>
 
-    <t-card class="list-card-container" :bordered="false">
-      <t-row justify="space-between">
-        <div class="left-operation-container">
+    <t-card class="table-card-container" :bordered="false">
+      <t-row class="operation-container" justify="space-between">
+        <div class="operation-container-left">
           <t-button @click="opOnClickRefresh"> {{ t('pages.apisixConsumer.operations.refresh') }} </t-button>
           <t-button @click="opClickCreate"> {{ t('pages.apisixConsumer.operations.create') }} </t-button>
           <t-button theme="danger" :disabled="tabSelectedRowKeys.length <= 0" @click="opOnClickDelete">
@@ -15,18 +15,24 @@
           <t-button variant="base" theme="default" :disabled="tabSelectedRowKeys.length <= 0" @click="opClickExport">
             {{ t('pages.apisixConsumer.operations.export') }}</t-button
           >
-          <p v-if="tabSelectedRowKeys.length > 0" class="selected-count">
+          <span v-if="tabSelectedRowKeys.length > 0" class="selected-count">
             {{ t('pages.apisixConsumer.selectedCount', { num: tabSelectedRowKeys.length }) }}
-          </p>
+          </span>
         </div>
-        <div class="search-input">
-          <t-input v-model="tabSearchValue" :placeholder="t('pages.apisixConsumer.placeholder')" clearable>
+        <div class="operation-container-right">
+          <t-input
+            v-model="tabSearchValue"
+            class="search-input"
+            :placeholder="t('pages.apisixGlobalRule.placeholder')"
+            clearable
+          >
             <template #suffix-icon>
               <search-icon size="16px" />
             </template>
           </t-input>
         </div>
       </t-row>
+
       <t-table
         v-model:display-columns="DISPLAY_COLUMNS"
         :data="tabData"

@@ -164,7 +164,7 @@ const handleLogout = () => {
 };
 
 const navToGitHub = () => {
-  window.open('https://github.com/Lensual/apisix-dashboard-unofficial');
+  window.open('https://github.com/APISIX-Unofficial-UI/apisix-dashboard-unofficial');
 };
 
 const navToHelper = () => {

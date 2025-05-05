@@ -1,4 +1,8 @@
 export default {
+  title: '全局规则',
+  description: `Plugin 配置可直接绑定在 Route 上，也可以被绑定在 Service 或 Consumer 上。
+如果你需要一个能作用于所有请求的 Plugin，可以通过 Global Rules 启用一个全局的插件配置。
+全局规则相对于 Route、Service、Plugin Config、Consumer 中的插件配置，Global Rules 中的插件总是优先执行。`,
   selectedCount: '已选 {num} 项',
   placeholder: '请输入内容搜索TODO',
   operation: '操作',

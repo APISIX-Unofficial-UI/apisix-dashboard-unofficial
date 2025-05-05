@@ -1,4 +1,6 @@
 export default {
+  title: '证书列表',
+  description: '证书被网关用于处理加密请求，它将与 SNI 关联，并与路由中主机名绑定。',
   selectedCount: '已选 {num} 项',
   placeholder: '请输入内容搜索TODO',
   operation: '操作',

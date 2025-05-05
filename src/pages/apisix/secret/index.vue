@@ -1,5 +1,9 @@
 <template>
   <div>
+    <t-card :bordered="false" :title="t('pages.apisixSecret.title')">
+      <pre>{{ t('pages.apisixSecret.description') }}</pre>
+    </t-card>
+
     <t-card class="list-card-container" :bordered="false">
       <t-row justify="space-between">
         <div class="left-operation-container">

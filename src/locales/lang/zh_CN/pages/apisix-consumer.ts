@@ -1,4 +1,6 @@
 export default {
+  title: '消费者列表',
+  description: '消费者是路由的消费方，形式包括开发者、最终用户、API 调用等。',
   selectedCount: '已选 {num} 项',
   placeholder: '请输入内容搜索TODO',
   operation: '操作',

@@ -272,5 +272,5 @@ const headerAffixedTop = computed(
 </script>
 
 <style lang="less" scoped>
-@import './index.less';
+@import '@/style/tablePage.less';
 </style>

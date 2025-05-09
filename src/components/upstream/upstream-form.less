@@ -73,3 +73,47 @@
     width: 98%;
   }
 }
+
+/* #region dom渐变动画 */
+.v-enter-active,
+.v-leave-active {
+  transition: all 0.24s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+/* #endregion */
+
+
+/* #region 列表渐变动画 */
+
+/* 进入动画：从下方向上淡入 */
+.list-enter-from {
+  opacity: 0;
+  transform: translateY(20px);
+}
+.list-enter-to {
+  opacity: 1;
+  transform: translateY(0);
+}
+.list-enter-active {
+  transition: all 0.24s ease;
+}
+
+/* 离开动画：向右淡出 */
+.list-leave-from {
+  opacity: 1;
+  transform: translateX(0);
+}
+.list-leave-to {
+  opacity: 0;
+  transform: translateX(60px);
+}
+.list-leave-active {
+  transition: all 0.24s ease;
+}
+/* #endregion */

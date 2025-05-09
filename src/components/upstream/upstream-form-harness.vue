@@ -93,7 +93,7 @@ const loadInitialData = (type: 'nodes' | 'discovery' | 'empty') => {
 
 const validateForm = async () => {
   if (upstreamFormRef.value) {
-    const result = upstreamFormRef.value.validate();
+    const result = await upstreamFormRef.value.validate();
     if (result === false) {
       validationResult.value = false;
       MessagePlugin.error('校验失败');

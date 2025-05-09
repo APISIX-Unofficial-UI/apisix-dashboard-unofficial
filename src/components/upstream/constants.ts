@@ -18,7 +18,7 @@ export const DISCOVERY_TYPE_OPTIONS = [
   { label: 'Eureka', value: 'eureka' },
 ];
 
-export const PROTOCOL_OPTIONS = [
+export const SCHEME_OPTIONS = [
   { label: 'HTTP', value: 'http' },
   { label: 'HTTPS', value: 'https' },
   { label: 'gRPC', value: 'grpc' },
@@ -28,7 +28,7 @@ export const PROTOCOL_OPTIONS = [
 export const ACTIVE_HEALTH_CHECK_TYPES = [
   { label: 'HTTP', value: 'http' },
   { label: 'HTTPS', value: 'https' },
-  { label: 'tcp', value: 'tcp' },
+  { label: 'TCP', value: 'tcp' },
 ];
 
 export const HEALTH_CHECK_RULES: Record<string, FormRule[]> = {

@@ -1,6 +1,146 @@
 <template>
   <t-form ref="formRef" :data="localUpstreamData" label-align="top" :colon="true">
-    <!-- 1. Load Balancer Algorithm -->
+    <!-- 1. Basic -->
+    <t-divider>{{ t('components.upstreamForm.basic.title') }}</t-divider>
+
+    <!-- 1.1. Upstream Type (Nodes or Discovery) -->
+    <t-form-item :label="t('components.upstreamForm.upstreamType.label')" name="upstreamTypeSelector" required-mark>
+      <t-radio-group v-model="upstreamType" variant="primary-filled">
+        <t-radio-button value="nodes">{{ t('components.upstreamForm.upstreamType.nodes') }}</t-radio-button>
+        <t-radio-button value="discovery">{{ t('components.upstreamForm.upstreamType.discovery') }}</t-radio-button>
+      </t-radio-group>
+    </t-form-item>
+
+    <Transition mode="out-in">
+      <div :key="upstreamType">
+        <!-- 1.2a. Nodes Configuration -->
+        <template v-if="upstreamType === 'nodes'">
+          <TransitionGroup name="list">
+            <t-form-item
+              v-for="(node, index) in uiNodes"
+              :key="index"
+              :label="index === 0 ? t('components.upstreamForm.nodes.label') : ''"
+              :name="`uiNodes[${index}]`"
+              class="node-item"
+            >
+              <div class="node-row">
+                <span class="node-label">{{ t('components.upstreamForm.nodes.hostLabel') }}</span>
+                <t-input
+                  v-model="node.host"
+                  class="node-input"
+                  :placeholder="t('components.upstreamForm.nodes.hostPlaceholder')"
+                  required-mark
+                />
+                <span class="node-label">{{ t('components.upstreamForm.nodes.portLabel') }}</span>
+                <t-input-number
+                  v-model="node.port"
+                  class="node-input-number node-input-port"
+                  :placeholder="t('components.upstreamForm.nodes.portPlaceholder')"
+                  :min="1"
+                  :max="65535"
+                  required-mark
+                  theme="normal"
+                />
+                <span class="node-label">{{ t('components.upstreamForm.nodes.weightLabel') }}</span>
+                <t-input-number
+                  v-model="node.weight"
+                  class="node-input-number node-input-weight"
+                  :placeholder="t('components.upstreamForm.nodes.weightPlaceholder')"
+                  :min="0"
+                  required-mark
+                  theme="normal"
+                />
+                <t-button
+                  v-if="uiNodes.length > 1"
+                  shape="circle"
+                  variant="text"
+                  theme="danger"
+                  class="remove-button"
+                  @click="removeNode(index)"
+                >
+                  <t-icon name="remove" />
+                </t-button>
+              </div>
+            </t-form-item>
+          </TransitionGroup>
+          <t-form-item>
+            <t-button variant="dashed" @click="addNode">
+              <template #icon><t-icon name="add" /></template>
+              {{ t('components.upstreamForm.nodes.addNode') }}
+            </t-button>
+          </t-form-item>
+        </template>
+
+        <!-- 1.2b. Discovery Configuration -->
+        <template v-if="upstreamType === 'discovery'">
+          <t-form-item :label="t('components.upstreamForm.discovery.typeLabel')" name="discovery_type" required-mark>
+            <t-select
+              v-model="localUpstreamData.discovery_type"
+              :placeholder="t('components.upstreamForm.discovery.typePlaceholder')"
+              clearable
+            >
+              <t-option
+                v-for="item in DISCOVERY_TYPE_OPTIONS"
+                :key="item.value"
+                :value="item.value"
+                :label="item.label"
+              />
+            </t-select>
+          </t-form-item>
+          <t-form-item
+            :label="t('components.upstreamForm.discovery.serviceNameLabel')"
+            name="service_name"
+            required-mark
+          >
+            <t-input
+              v-model="localUpstreamData.service_name"
+              :placeholder="t('components.upstreamForm.discovery.serviceNamePlaceholder')"
+            />
+          </t-form-item>
+        </template>
+      </div>
+    </Transition>
+
+    <!-- 1.3. Scheme -->
+    <t-form-item :label="t('components.upstreamForm.scheme.label')" name="scheme" required-mark>
+      <t-select v-model="localUpstreamData.scheme" :placeholder="t('components.upstreamForm.scheme.placeholder')">
+        <t-option v-for="item in SCHEME_OPTIONS" :key="item.value" :value="item.value" :label="item.label" />
+      </t-select>
+    </t-form-item>
+
+    <!-- 1.4. Host Header -->
+    <t-form-item :label="t('components.upstreamForm.hostHeader.label')" name="pass_host">
+      <t-radio-group
+        v-model="localUpstreamData.pass_host"
+        variant="primary-filled"
+        :placeholder="t('components.upstreamForm.hostHeader.placeholder')"
+      >
+        <t-radio-button value="pass">
+          {{ t('components.upstreamForm.hostHeader.pass') }}
+        </t-radio-button>
+        <t-radio-button value="node">
+          {{ t('components.upstreamForm.hostHeader.node') }}
+        </t-radio-button>
+        <t-radio-button value="rewrite">
+          {{ t('components.upstreamForm.hostHeader.rewrite') }}
+        </t-radio-button>
+      </t-radio-group>
+    </t-form-item>
+    <Transition mode="out-in">
+      <t-form-item
+        v-if="localUpstreamData.pass_host === 'rewrite'"
+        :label="t('components.upstreamForm.hostHeader.upstreamHostLabel')"
+        name="upstream_host"
+      >
+        <t-input
+          v-model="localUpstreamData.upstream_host"
+          :placeholder="t('components.upstreamForm.hostHeader.upstreamHostPlaceholder')"
+        />
+      </t-form-item>
+    </Transition>
+
+    <!-- 2. Load Balancer Algorithm -->
+    <t-divider>{{ t('components.upstreamForm.loadBalancer.title') }}</t-divider>
     <t-form-item :label="t('components.upstreamForm.loadBalancer.label')" name="type">
       <t-select
         v-model="localUpstreamData.type"
@@ -11,117 +151,8 @@
       </t-select>
     </t-form-item>
 
-    <!-- 2. Upstream Type (Nodes or Discovery) -->
-    <t-form-item :label="t('components.upstreamForm.upstreamType.label')" name="upstreamTypeSelector" required-mark>
-      <t-radio-group v-model="upstreamType" variant="primary-filled">
-        <t-radio-button value="nodes">{{ t('components.upstreamForm.upstreamType.nodes') }}</t-radio-button>
-        <t-radio-button value="discovery">{{ t('components.upstreamForm.upstreamType.discovery') }}</t-radio-button>
-      </t-radio-group>
-    </t-form-item>
-
-    <!-- 2a. Nodes Configuration -->
-    <div v-if="upstreamType === 'nodes'">
-      <t-form-item
-        v-for="(node, index) in uiNodes"
-        :key="index"
-        :label="index === 0 ? t('components.upstreamForm.nodes.label') : ''"
-        :name="`uiNodes[${index}]`"
-        class="node-item"
-      >
-        <div class="node-row">
-          <span class="node-label">{{ t('components.upstreamForm.nodes.hostLabel') }}</span>
-          <t-input
-            v-model="node.host"
-            class="node-input"
-            :placeholder="t('components.upstreamForm.nodes.hostPlaceholder')"
-            required-mark
-          />
-          <span class="node-label">{{ t('components.upstreamForm.nodes.portLabel') }}</span>
-          <t-input-number
-            v-model="node.port"
-            class="node-input-number node-input-port"
-            :placeholder="t('components.upstreamForm.nodes.portPlaceholder')"
-            :min="1"
-            :max="65535"
-            required-mark
-            theme="normal"
-          />
-          <span class="node-label">{{ t('components.upstreamForm.nodes.weightLabel') }}</span>
-          <t-input-number
-            v-model="node.weight"
-            class="node-input-number node-input-weight"
-            :placeholder="t('components.upstreamForm.nodes.weightPlaceholder')"
-            :min="0"
-            required-mark
-            theme="normal"
-          />
-          <t-button
-            v-if="uiNodes.length > 1"
-            shape="circle"
-            variant="text"
-            theme="danger"
-            class="remove-button"
-            @click="removeNode(index)"
-          >
-            <t-icon name="remove" />
-          </t-button>
-        </div>
-      </t-form-item>
-      <t-form-item>
-        <t-button variant="dashed" @click="addNode">
-          <template #icon><t-icon name="add" /></template>
-          {{ t('components.upstreamForm.nodes.addNode') }}
-        </t-button>
-      </t-form-item>
-    </div>
-
-    <!-- 2b. Discovery Configuration -->
-    <div v-if="upstreamType === 'discovery'">
-      <t-form-item :label="t('components.upstreamForm.discovery.typeLabel')" name="discovery_type" required-mark>
-        <t-select
-          v-model="localUpstreamData.discovery_type"
-          :placeholder="t('components.upstreamForm.discovery.typePlaceholder')"
-          clearable
-        >
-          <t-option v-for="item in DISCOVERY_TYPE_OPTIONS" :key="item.value" :value="item.value" :label="item.label" />
-        </t-select>
-      </t-form-item>
-      <t-form-item :label="t('components.upstreamForm.discovery.serviceNameLabel')" name="service_name" required-mark>
-        <t-input
-          v-model="localUpstreamData.service_name"
-          :placeholder="t('components.upstreamForm.discovery.serviceNamePlaceholder')"
-        />
-      </t-form-item>
-      <t-form-item :label="t('components.upstreamForm.discovery.hostHeaderLabel')" name="pass_host">
-        <t-radio-group
-          v-model="localUpstreamData.pass_host"
-          variant="primary-filled"
-          :placeholder="t('components.upstreamForm.discovery.hostHeaderPlaceholder')"
-        >
-          <t-radio-button value="pass">
-            {{ t('components.upstreamForm.discovery.hostHeaderPass') }}
-          </t-radio-button>
-          <t-radio-button value="node">
-            {{ t('components.upstreamForm.discovery.hostHeaderNode') }}
-          </t-radio-button>
-          <t-radio-button value="rewrite"
-            >{{ t('components.upstreamForm.discovery.hostHeaderRewrite') }}
-          </t-radio-button>
-        </t-radio-group>
-      </t-form-item>
-      <t-form-item
-        v-if="localUpstreamData.pass_host === 'rewrite'"
-        :label="t('components.upstreamForm.discovery.upstreamHostLabel')"
-        name="upstream_host"
-      >
-        <t-input
-          v-model="localUpstreamData.upstream_host"
-          :placeholder="t('components.upstreamForm.discovery.upstreamHostPlaceholder')"
-        />
-      </t-form-item>
-    </div>
-
     <!-- 3. Retries and Retry Timeout -->
+    <t-divider>{{ t('components.upstreamForm.retries.title') }}</t-divider>
     <t-row :gutter="[16, 0]">
       <t-col :span="6">
         <t-form-item :label="t('components.upstreamForm.retries.label')" name="retries">
@@ -149,14 +180,7 @@
       </t-col>
     </t-row>
 
-    <!-- 4. Protocol -->
-    <t-form-item :label="t('components.upstreamForm.protocol.label')" name="scheme" required-mark>
-      <t-select v-model="localUpstreamData.scheme" :placeholder="t('components.upstreamForm.protocol.placeholder')">
-        <t-option v-for="item in PROTOCOL_OPTIONS" :key="item.value" :value="item.value" :label="item.label" />
-      </t-select>
-    </t-form-item>
-
-    <!-- 5. Timeout Settings -->
+    <!-- 4. Timeout Settings -->
     <t-row :gutter="[16, 0]">
       <t-col :span="4">
         <t-form-item :label="t('components.upstreamForm.connectTimeout.label')" name="timeout.connect">
@@ -199,7 +223,7 @@
       </t-col>
     </t-row>
 
-    <!-- 6. Connection Pool -->
+    <!-- 5. Connection Pool -->
     <t-divider>{{ t('components.upstreamForm.connectionPool.title') }}</t-divider>
     <t-row :gutter="[16, 16]">
       <t-col :span="4">
@@ -245,136 +269,142 @@
       </t-col>
     </t-row>
 
-    <!-- 7. Health Checks -->
+    <!-- 6. Health Checks -->
     <t-divider>{{ t('components.upstreamForm.healthCheck.title') }}</t-divider>
     <t-form-item :label="t('components.upstreamForm.healthCheck.active.enableLabel')" name="healthCheckActiveEnabled">
       <t-switch v-model="isHealthCheckActive" />
     </t-form-item>
 
-    <div v-if="isHealthCheckActive">
-      <t-form-item
-        :label="t('components.upstreamForm.healthCheck.active.healthCheckType')"
-        name="checks.active.type"
-        required-mark
-      >
-        <t-radio-group v-model="localUpstreamData.checks.active.type" variant="primary-filled">
-          <t-radio-button
-            v-for="item in ACTIVE_HEALTH_CHECK_TYPES"
-            :key="item.value"
-            :value="item.value"
-            :label="item.label"
-          >
-            {{ item.label }}
-          </t-radio-button>
-        </t-radio-group>
-      </t-form-item>
-      <t-form-item
-        :label="t('components.upstreamForm.healthCheck.active.httpPathLabel')"
-        name="checks.active.http_path"
-        required-mark
-      >
-        <t-input
-          v-model="localUpstreamData.checks.active.http_path"
-          :placeholder="t('components.upstreamForm.healthCheck.active.httpPathPlaceholder')"
-        />
-      </t-form-item>
-      <t-form-item :label="t('components.upstreamForm.healthCheck.active.hostLabel')" name="checks.active.host">
-        <t-input
-          v-model="localUpstreamData.checks.active.host"
-          :placeholder="t('components.upstreamForm.healthCheck.active.hostPlaceholder')"
-        />
-      </t-form-item>
-      <t-form-item :label="t('components.upstreamForm.healthCheck.active.portLabel')" name="checks.active.port">
-        <t-input-number
-          v-model="localUpstreamData.checks.active.port"
-          :placeholder="t('components.upstreamForm.healthCheck.active.portPlaceholder')"
-          theme="normal"
-          :min="1"
-          :max="65535"
-          style="width: 100%"
-        />
-      </t-form-item>
-      <t-row :gutter="[16, 0]">
-        <t-col :span="6">
-          <t-form-item
-            :label="t('components.upstreamForm.healthCheck.active.timeoutLabel')"
-            name="checks.active.timeout"
-            required-mark
-          >
-            <t-input-number
-              v-model="localUpstreamData.checks.active.timeout"
-              :placeholder="t('components.upstreamForm.healthCheck.active.timeoutPlaceholder')"
-              theme="normal"
-              :min="1"
-              style="width: 100%"
+    <Transition mode="out-in">
+      <div v-if="isHealthCheckActive">
+        <t-form-item
+          :label="t('components.upstreamForm.healthCheck.active.healthCheckType')"
+          name="checks.active.type"
+          required-mark
+        >
+          <t-radio-group v-model="localUpstreamData.checks.active.type" variant="primary-filled">
+            <t-radio-button
+              v-for="item in ACTIVE_HEALTH_CHECK_TYPES"
+              :key="item.value"
+              :value="item.value"
+              :label="item.label"
             >
-              <template #suffix>s</template>
-            </t-input-number>
-          </t-form-item>
-        </t-col>
-        <t-col :span="6">
-          <t-form-item
-            :label="t('components.upstreamForm.healthCheck.active.concurrencyLabel')"
-            name="checks.active.concurrency"
-            required-mark
-          >
-            <t-input-number
-              v-model="localUpstreamData.checks.active.concurrency"
-              :placeholder="t('components.upstreamForm.healthCheck.active.concurrencyPlaceholder')"
-              theme="normal"
-              :min="1"
-              style="width: 100%"
-            />
-          </t-form-item>
-        </t-col>
-      </t-row>
-
-      <t-form-item
-        v-if="localUpstreamData.checks.active.type === 'https'"
-        :label="t('components.upstreamForm.healthCheck.active.httpsVerifyCertificateLabel')"
-        name="checks.active.https_verify_certificate"
-      >
-        <t-switch v-model="localUpstreamData.checks.active.https_verify_certificate" />
-      </t-form-item>
-
-      <t-divider align="left">{{ t('components.upstreamForm.healthCheck.active.healthy.title') }}</t-divider>
-      <t-row :gutter="[16, 0]">
-        <t-col :span="6">
-          <t-form-item
-            :label="t('components.upstreamForm.healthCheck.active.healthy.intervalLabel')"
-            name="checks.active.healthy.interval"
-            required-mark
-            :rules="HEALTH_CHECK_RULES['checks.active.healthy.interval']"
-          >
-            <t-input-number
-              v-model="localUpstreamData.checks.active.healthy.interval"
-              :placeholder="t('components.upstreamForm.healthCheck.active.healthy.intervalPlaceholder')"
-              theme="normal"
-              :min="0"
-              style="width: 100%"
+              {{ item.label }}
+            </t-radio-button>
+          </t-radio-group>
+        </t-form-item>
+        <t-form-item
+          :label="t('components.upstreamForm.healthCheck.active.httpPathLabel')"
+          name="checks.active.http_path"
+          required-mark
+        >
+          <t-input
+            v-model="localUpstreamData.checks.active.http_path"
+            :placeholder="t('components.upstreamForm.healthCheck.active.httpPathPlaceholder')"
+          />
+        </t-form-item>
+        <t-form-item :label="t('components.upstreamForm.healthCheck.active.hostLabel')" name="checks.active.host">
+          <t-input
+            v-model="localUpstreamData.checks.active.host"
+            :placeholder="t('components.upstreamForm.healthCheck.active.hostPlaceholder')"
+          />
+        </t-form-item>
+        <t-form-item :label="t('components.upstreamForm.healthCheck.active.portLabel')" name="checks.active.port">
+          <t-input-number
+            v-model="localUpstreamData.checks.active.port"
+            :placeholder="t('components.upstreamForm.healthCheck.active.portPlaceholder')"
+            theme="normal"
+            :min="1"
+            :max="65535"
+            style="width: 100%"
+          />
+        </t-form-item>
+        <t-row :gutter="[16, 0]">
+          <t-col :span="6">
+            <t-form-item
+              :label="t('components.upstreamForm.healthCheck.active.timeoutLabel')"
+              name="checks.active.timeout"
+              required-mark
             >
-              <template #suffix>s</template>
-            </t-input-number>
-          </t-form-item>
-        </t-col>
-        <t-col :span="6">
+              <t-input-number
+                v-model="localUpstreamData.checks.active.timeout"
+                :placeholder="t('components.upstreamForm.healthCheck.active.timeoutPlaceholder')"
+                theme="normal"
+                :min="1"
+                style="width: 100%"
+              >
+                <template #suffix>s</template>
+              </t-input-number>
+            </t-form-item>
+          </t-col>
+          <t-col :span="6">
+            <t-form-item
+              :label="t('components.upstreamForm.healthCheck.active.concurrencyLabel')"
+              name="checks.active.concurrency"
+              required-mark
+            >
+              <t-input-number
+                v-model="localUpstreamData.checks.active.concurrency"
+                :placeholder="t('components.upstreamForm.healthCheck.active.concurrencyPlaceholder')"
+                theme="normal"
+                :min="1"
+                style="width: 100%"
+              />
+            </t-form-item>
+          </t-col>
+        </t-row>
+
+        <Transition mode="out-in">
           <t-form-item
-            :label="t('components.upstreamForm.healthCheck.active.healthy.successesLabel')"
-            name="checks.active.healthy.successes"
-            required-mark
-            :rules="HEALTH_CHECK_RULES['checks.active.healthy.successes']"
+            v-if="localUpstreamData.checks.active.type === 'https'"
+            :label="t('components.upstreamForm.healthCheck.active.httpsVerifyCertificateLabel')"
+            name="checks.active.https_verify_certificate"
           >
-            <t-input-number
-              v-model="localUpstreamData.checks.active.healthy.successes"
-              :placeholder="t('components.upstreamForm.healthCheck.active.healthy.successesPlaceholder')"
-              theme="normal"
-              :min="1"
-              style="width: 100%"
-            />
+            <t-switch v-model="localUpstreamData.checks.active.https_verify_certificate" />
           </t-form-item>
-        </t-col>
-        <t-col v-if="localUpstreamData.checks.active.type != 'tcp'" :span="12">
+        </Transition>
+
+        <t-divider align="left">{{ t('components.upstreamForm.healthCheck.active.healthy.title') }}</t-divider>
+        <t-row :gutter="[16, 0]">
+          <t-col :span="6">
+            <t-form-item
+              :label="t('components.upstreamForm.healthCheck.active.healthy.intervalLabel')"
+              name="checks.active.healthy.interval"
+              required-mark
+              :rules="HEALTH_CHECK_RULES['checks.active.healthy.interval']"
+            >
+              <t-input-number
+                v-model="localUpstreamData.checks.active.healthy.interval"
+                :placeholder="t('components.upstreamForm.healthCheck.active.healthy.intervalPlaceholder')"
+                theme="normal"
+                :min="0"
+                style="width: 100%"
+              >
+                <template #suffix>s</template>
+              </t-input-number>
+            </t-form-item>
+          </t-col>
+          <t-col :span="6">
+            <t-form-item
+              :label="t('components.upstreamForm.healthCheck.active.healthy.successesLabel')"
+              name="checks.active.healthy.successes"
+              required-mark
+              :rules="HEALTH_CHECK_RULES['checks.active.healthy.successes']"
+            >
+              <t-input-number
+                v-model="localUpstreamData.checks.active.healthy.successes"
+                :placeholder="t('components.upstreamForm.healthCheck.active.healthy.successesPlaceholder')"
+                theme="normal"
+                :min="1"
+                style="width: 100%"
+              />
+            </t-form-item>
+          </t-col>
+        </t-row>
+
+        <Transition mode="out-in">
           <t-form-item
+            v-if="localUpstreamData.checks.active.type != 'tcp'"
             :label="t('components.upstreamForm.healthCheck.active.healthy.httpStatusesLabel')"
             name="checks.active.healthy.http_statuses"
           >
@@ -386,63 +416,67 @@
               auto-width
             />
           </t-form-item>
-        </t-col>
-      </t-row>
+        </Transition>
 
-      <t-divider align="left">{{ t('components.upstreamForm.healthCheck.active.unhealthy.title') }}</t-divider>
-      <t-row :gutter="[16, 0]">
-        <t-col :span="6">
-          <t-form-item
-            :label="t('components.upstreamForm.healthCheck.active.unhealthy.intervalLabel')"
-            name="checks.active.unhealthy.interval"
-            required-mark
-            :rules="HEALTH_CHECK_RULES['checks.active.unhealthy.interval']"
-          >
-            <t-input-number
-              v-model="localUpstreamData.checks.active.unhealthy.interval"
-              :placeholder="t('components.upstreamForm.healthCheck.active.unhealthy.intervalPlaceholder')"
-              theme="normal"
-              :min="0"
-              style="width: 100%"
+        <t-divider align="left">{{ t('components.upstreamForm.healthCheck.active.unhealthy.title') }}</t-divider>
+        <t-row :gutter="[16, 0]">
+          <t-col :span="6">
+            <t-form-item
+              :label="t('components.upstreamForm.healthCheck.active.unhealthy.intervalLabel')"
+              name="checks.active.unhealthy.interval"
+              required-mark
+              :rules="HEALTH_CHECK_RULES['checks.active.unhealthy.interval']"
             >
-              <template #suffix>s</template>
-            </t-input-number>
-          </t-form-item>
-        </t-col>
-        <t-col v-if="localUpstreamData.checks.active.type != 'tcp'" :span="6">
+              <t-input-number
+                v-model="localUpstreamData.checks.active.unhealthy.interval"
+                :placeholder="t('components.upstreamForm.healthCheck.active.unhealthy.intervalPlaceholder')"
+                theme="normal"
+                :min="0"
+                style="width: 100%"
+              >
+                <template #suffix>s</template>
+              </t-input-number>
+            </t-form-item>
+          </t-col>
+          <Transition mode="out-in">
+            <t-col v-if="localUpstreamData.checks.active.type != 'tcp'" :span="6">
+              <t-form-item
+                :label="t('components.upstreamForm.healthCheck.active.unhealthy.httpFailuresLabel')"
+                name="checks.active.unhealthy.http_failures"
+                required-mark
+                :rules="HEALTH_CHECK_RULES['checks.active.unhealthy.http_failures']"
+              >
+                <t-input-number
+                  v-model="localUpstreamData.checks.active.unhealthy.http_failures"
+                  :placeholder="t('components.upstreamForm.healthCheck.active.unhealthy.httpFailuresPlaceholder')"
+                  theme="normal"
+                  :min="1"
+                  style="width: 100%"
+                />
+              </t-form-item>
+            </t-col>
+          </Transition>
+          <Transition mode="out-in">
+            <t-col v-if="localUpstreamData.checks.active.type === 'tcp'" :span="6">
+              <t-form-item
+                :label="t('components.upstreamForm.healthCheck.active.unhealthy.tcpFailuresLabel')"
+                name="checks.active.unhealthy.tcp_failures"
+              >
+                <t-input-number
+                  v-model="localUpstreamData.checks.active.unhealthy.tcp_failures"
+                  :placeholder="t('components.upstreamForm.healthCheck.active.unhealthy.tcpFailuresPlaceholder')"
+                  theme="normal"
+                  :min="1"
+                  :max="254"
+                  style="width: 100%"
+                />
+              </t-form-item>
+            </t-col>
+          </Transition>
+        </t-row>
+        <Transition mode="out-in">
           <t-form-item
-            :label="t('components.upstreamForm.healthCheck.active.unhealthy.httpFailuresLabel')"
-            name="checks.active.unhealthy.http_failures"
-            required-mark
-            :rules="HEALTH_CHECK_RULES['checks.active.unhealthy.http_failures']"
-          >
-            <t-input-number
-              v-model="localUpstreamData.checks.active.unhealthy.http_failures"
-              :placeholder="t('components.upstreamForm.healthCheck.active.unhealthy.httpFailuresPlaceholder')"
-              theme="normal"
-              :min="1"
-              style="width: 100%"
-            />
-          </t-form-item>
-        </t-col>
-        <t-col :span="6">
-          <t-form-item
-            v-if="localUpstreamData.checks.active.type === 'tcp'"
-            :label="t('components.upstreamForm.healthCheck.active.unhealthy.tcpFailuresLabel')"
-            name="checks.active.unhealthy.tcp_failures"
-          >
-            <t-input-number
-              v-model="localUpstreamData.checks.active.unhealthy.tcp_failures"
-              :placeholder="t('components.upstreamForm.healthCheck.active.unhealthy.tcpFailuresPlaceholder')"
-              theme="normal"
-              :min="1"
-              :max="254"
-              style="width: 100%"
-            />
-          </t-form-item>
-        </t-col>
-        <t-col v-if="localUpstreamData.checks.active.type != 'tcp'" :span="12">
-          <t-form-item
+            v-if="localUpstreamData.checks.active.type != 'tcp'"
             :label="t('components.upstreamForm.healthCheck.active.unhealthy.httpStatusesLabel')"
             name="checks.active.unhealthy.http_statuses"
           >
@@ -454,9 +488,9 @@
               auto-width
             />
           </t-form-item>
-        </t-col>
-      </t-row>
-    </div>
+        </Transition>
+      </div>
+    </Transition>
   </t-form>
 </template>
 
@@ -473,7 +507,7 @@ import {
   DISCOVERY_TYPE_OPTIONS,
   HEALTH_CHECK_RULES,
   LOAD_BALANCER_OPTIONS,
-  PROTOCOL_OPTIONS,
+  SCHEME_OPTIONS,
 } from './constants';
 
 interface UiNode {
@@ -681,13 +715,13 @@ const removeNode = (index: number) => {
 
 // --- Expose Methods ---
 defineExpose({
-  validate: () => {
+  validate: async () => {
     if (upstreamType.value === 'nodes') {
       // Validate each node's host, port, and weight
       for (const node of uiNodes.value) {
         if (!node.host || !node.port || node.weight === null || node.weight < 0) {
           MessagePlugin.warning(t('components.upstreamForm.warnings.invalidNodeFormat'));
-          return false;
+          return false; // TODO 返回验证信息而不是 false
         }
       }
     }

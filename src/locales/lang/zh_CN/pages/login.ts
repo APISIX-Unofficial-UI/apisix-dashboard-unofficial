@@ -4,13 +4,13 @@ export default {
   signIn: '登录',
   refresh: '刷新',
   input: {
-    apisixAdminEndpoint: 'AdminEndpoint',
-    apisixControlEndpoint: 'ControlEndpoint',
-    apisixAdminKey: 'AdminKey',
+    adminEndpoint: 'AdminEndpoint',
+    adminKey: 'AdminKey',
+    ctrlEndpoint: 'ControlEndpoint',
+    ctrlKey: 'ControllKey',
   },
   required: {
-    apisixAdminEndpoint: 'AdminEndpoint 必填',
-    apisixControlEndpoint: 'ControlEndpoint 必填',
-    apisixAdminKey: 'AdminKey 必填',
+    adminEndpoint: 'AdminEndpoint 必填',
+    adminKey: 'AdminKey 必填',
   },
 };

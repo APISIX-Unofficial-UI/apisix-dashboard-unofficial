@@ -1,6 +1,6 @@
 <template>
   <div :class="prefix + '-footer'">
-    <div>github.com/Lensual/apisix-dashboard-unofficial</div>
+    <div>https://github.com/APISIX-Unofficial-UI/apisix-dashboard-unofficial</div>
     <div>
       Apache APISIX, APISIX®, Apache, the Apache feather logo, and the Apache APISIX project logo are either registered
       trademarks or trademarks of the Apache Software Foundation.

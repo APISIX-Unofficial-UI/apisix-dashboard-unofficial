@@ -1,3 +1,13 @@
+import {
+  AppIcon,
+  Certificate1Icon,
+  File1Icon,
+  KeyIcon,
+  ServerIcon,
+  SitemapIcon,
+  SystemRegulationIcon,
+  UserSafetyIcon,
+} from 'tdesign-icons-vue-next';
 import { shallowRef } from 'vue';
 
 import apisixSvg from '@/assets/apisix_svg.svg?component';
@@ -24,6 +34,7 @@ export default [
         name: 'ApisixRoute',
         component: () => import('@/pages/apisix/route/index.vue'),
         meta: {
+          icon: shallowRef(SitemapIcon),
           title: {
             zh_CN: '路由',
             en_US: 'Route',
@@ -47,6 +58,7 @@ export default [
         name: 'ApisixUpstream',
         component: () => import('@/pages/apisix/upstream/index.vue'),
         meta: {
+          icon: shallowRef(ServerIcon),
           title: {
             zh_CN: '上游',
             en_US: 'Upstream',
@@ -70,6 +82,7 @@ export default [
         name: 'ApisixService',
         component: () => import('@/pages/apisix/service/index.vue'),
         meta: {
+          icon: shallowRef(AppIcon),
           title: {
             zh_CN: '服务',
             en_US: 'Service',
@@ -93,6 +106,7 @@ export default [
         name: 'ApisixConsumer',
         component: () => import('@/pages/apisix/consumer/index.vue'),
         meta: {
+          icon: shallowRef(UserSafetyIcon),
           title: {
             zh_CN: '消费者',
             en_US: 'Consumer',
@@ -116,6 +130,7 @@ export default [
         name: 'ApisixProto',
         component: () => import('@/pages/apisix/proto/index.vue'),
         meta: {
+          icon: shallowRef(File1Icon),
           title: {
             zh_CN: 'Protocol Buffers',
             en_US: 'Protocol Buffers',
@@ -139,6 +154,7 @@ export default [
         name: 'ApisixGlobalRule',
         component: () => import('@/pages/apisix/global_rule/index.vue'),
         meta: {
+          icon: shallowRef(SystemRegulationIcon),
           title: {
             zh_CN: '全局规则',
             en_US: 'Global Rule',
@@ -162,6 +178,7 @@ export default [
         name: 'ApisixSsl',
         component: () => import('@/pages/apisix/ssl/index.vue'),
         meta: {
+          icon: shallowRef(Certificate1Icon),
           title: {
             zh_CN: 'SSL',
             en_US: 'SSL',
@@ -185,6 +202,7 @@ export default [
         name: 'ApisixSecret',
         component: () => import('@/pages/apisix/secret/index.vue'),
         meta: {
+          icon: shallowRef(KeyIcon),
           title: {
             zh_CN: '密钥管理器',
             en_US: 'SecretManager',

@@ -1,8 +1,12 @@
 <template>
   <div>
-    <t-card class="list-card-container" :bordered="false">
-      <t-row justify="space-between">
-        <div class="left-operation-container">
+    <t-card class="title-card" :bordered="false" :title="t('pages.apisixUpstream.title')">
+      <p>{{ t('pages.apisixUpstream.description') }}</p>
+    </t-card>
+
+    <t-card class="table-card-container" :bordered="false">
+      <t-row class="operation-container" justify="space-between">
+        <div class="operation-container-left">
           <t-button @click="opOnClickRefresh"> {{ t('pages.apisixUpstream.operations.refresh') }} </t-button>
           <t-button @click="opClickCreate"> {{ t('pages.apisixUpstream.operations.create') }} </t-button>
           <t-button theme="danger" :disabled="tabSelectedRowKeys.length <= 0" @click="opOnClickDelete">
@@ -11,12 +15,17 @@
           <t-button variant="base" theme="default" :disabled="tabSelectedRowKeys.length <= 0" @click="opClickExport">
             {{ t('pages.apisixUpstream.operations.export') }}</t-button
           >
-          <p v-if="tabSelectedRowKeys.length > 0" class="selected-count">
+          <span v-if="tabSelectedRowKeys.length > 0" class="selected-count">
             {{ t('pages.apisixUpstream.selectedCount', { num: tabSelectedRowKeys.length }) }}
-          </p>
+          </span>
         </div>
-        <div class="search-input">
-          <t-input v-model="tabSearchValue" :placeholder="t('pages.apisixUpstream.placeholder')" clearable>
+        <div class="operation-container-right">
+          <t-input
+            v-model="tabSearchValue"
+            class="search-input"
+            :placeholder="t('pages.apisixUpstream.placeholder')"
+            clearable
+          >
             <template #suffix-icon>
               <search-icon size="16px" />
             </template>
@@ -254,37 +263,5 @@ const headerAffixedTop = computed(
 </script>
 
 <style lang="less" scoped>
-.payment-col {
-  display: flex;
-
-  .trend-container {
-    display: flex;
-    align-items: center;
-    margin-left: var(--td-comp-margin-s);
-  }
-}
-
-.list-card-container {
-  padding: var(--td-comp-paddingTB-xxl) var(--td-comp-paddingLR-xxl);
-
-  :deep(.t-card__body) {
-    padding: 0;
-  }
-}
-
-.left-operation-container {
-  display: flex;
-  align-items: center;
-  margin-bottom: var(--td-comp-margin-xxl);
-
-  .selected-count {
-    display: inline-block;
-    margin-left: var(--td-comp-margin-l);
-    color: var(--td-text-color-secondary);
-  }
-}
-
-.search-input {
-  width: 360px;
-}
+@import '@/style/tablePage.less';
 </style>

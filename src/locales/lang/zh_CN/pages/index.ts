@@ -1,6 +1,7 @@
 import apisixConsumer from './apisix-consumer';
 import apisixConsumerEdit from './apisix-consumer-edit';
 import apisixGlobalRule from './apisix-globalRule';
+import apisixPlugin from './apisix-plugin';
 import apisixProto from './apisix-proto';
 import apisixRoute from './apisix-route';
 import apisixRouteEdit from './apisix-route-edit';
@@ -31,4 +32,5 @@ export default {
   apisixSsl,
   apisixSecret,
   apisixSecretEdit,
+  apisixPlugin,
 };

@@ -221,6 +221,17 @@ export default [
           hidden: true,
         },
       },
+      {
+        path: 'plugin',
+        name: 'ApisixPlugin',
+        component: () => import('@/pages/apisix/plugin/index.vue'),
+        meta: {
+          title: {
+            zh_CN: '插件信息',
+            en_US: 'Plugin Info',
+          },
+        },
+      },
     ],
   },
 ];
